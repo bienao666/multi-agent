@@ -60,6 +60,7 @@
 启用后，你必须自动按以下方式处理后续请求：
 
 - 简单任务：Manager 可直接处理，但必须自检。
+- 如果 `reviewer_for_simple: on`，简单任务也必须进入 Reviewer 验收。
 - 中等任务：Manager 创建 Task ID 和 Acceptance Criteria，Builder 执行，Reviewer 验收。
 - 复杂任务：Manager 拆分子任务，必要时创建临时 Agent，Builder 执行，Reviewer 验收。
 - 高风险任务：Manager 必须明确验收标准，Builder 最小化修改，Reviewer 强制验收，必要时询问用户。
@@ -349,22 +350,44 @@ AGENTS.md
 ```md
 # Multi-Agent Settings
 
+# 是否默认启用多 Agent 协作模式。
+# off：项目只安装规则，不自动启用，适合提交到团队仓库。
+# on：项目默认启用，多数团队不建议直接提交为 on。
 multi_agent_default: off
+
+# 简单任务是否也需要 Reviewer 复核。
+# off：简单任务由 Manager 自检即可。
+# on：简单任务也进入 Manager + Reviewer 流程。
+reviewer_for_simple_default: off
 
 ## Meaning
 
 - `off`: Multi-Agent Mode is available but not enabled by default.
 - `on`: Multi-Agent Mode is enabled by default for this project.
+- `reviewer_for_simple_default: off`: Simple tasks are handled by Manager with self-check only.
+- `reviewer_for_simple_default: on`: Simple tasks also require Reviewer.
 
 ## Local Override
 
 Individual developers may create `.agents/local-settings.md`:
 
+    # 是否在当前开发者本地启用多 Agent 协作模式。
+    # on：本地启用。
+    # off：本地关闭，并覆盖项目默认值。
     multi_agent: on
+
+    # 简单任务是否也需要 Reviewer 复核。
+    # on：简单任务也由 Reviewer 检查。
+    # off：简单任务只由 Manager 自检。
+    reviewer_for_simple: on
 
 or:
 
+    # 本地关闭多 Agent 协作模式。
     multi_agent: off
+
+    # 本地关闭简单任务 Reviewer 复核。
+    reviewer_for_simple: off
 
 `local-settings.md` must be ignored by version control because it represents personal workflow preference.
 ```
@@ -645,6 +668,7 @@ This project uses a Manager / Builder / Reviewer workflow.
 - Complex implementation tasks should not be considered complete until reviewed.
 - Multi-Agent Mode is available but disabled by default.
 - Check `.agents/settings.md` and `.agents/local-settings.md` before deciding whether to use it.
+- Check `reviewer_for_simple_default` and `reviewer_for_simple` before deciding whether simple tasks require Reviewer.
 - If enabled, users do not need to explicitly ask for the Manager / Builder / Reviewer workflow.
 - If disabled, handle requests normally while still respecting project rules and safety boundaries.
 
@@ -673,11 +697,12 @@ This project uses a Manager / Builder / Reviewer workflow.
 For every new user request:
 
 1. Check whether Multi-Agent Mode is enabled.
-2. If enabled, treat the request as entering the Manager intake queue.
-3. If enabled, classify complexity.
-4. If enabled, check relevant capabilities, including agent-skills when available.
-5. If enabled, choose the workflow automatically.
-6. If disabled, proceed with normal single-agent handling.
+2. Check whether Reviewer is enabled for simple tasks.
+3. If enabled, treat the request as entering the Manager intake queue.
+4. If enabled, classify complexity.
+5. If enabled, check relevant capabilities, including agent-skills when available.
+6. If enabled, choose the workflow automatically.
+7. If disabled, proceed with normal single-agent handling.
 
 When enabled, the user should be able to ask naturally. Do not require phrases like "use multi-agent mode" or "use Manager / Builder / Reviewer".
 
@@ -831,6 +856,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 4. **Delegation**
    - 简单任务可以由 Manager 直接完成，但仍要自检。
+   - 如果 `reviewer_for_simple` 或 `reviewer_for_simple_default` 为 `on`，简单任务也必须进入 Reviewer 验收。
    - 中等或复杂任务必须分配给 Builder。
    - 高风险任务必须进入 Reviewer 验收。
    - 如果匹配到合适能力，任务分配中必须包含 Capability、Reason 和 Fallback。

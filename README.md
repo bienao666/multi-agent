@@ -33,15 +33,25 @@
 
 ```text
 .agents/settings.md
+# 项目默认不启用多 Agent，适合提交到团队仓库
 multi_agent_default: off
+
+# 简单任务默认不启用 Reviewer
+reviewer_for_simple_default: off
 ```
 
 个人本地启用：
 
 ```text
 .agents/local-settings.md
+# 本地启用多 Agent
 multi_agent: on
+
+# 本地启用简单任务 Reviewer 复核
+reviewer_for_simple: on
 ```
+
+其中 `reviewer_for_simple: on` 表示简单任务也会启用 Reviewer 复核；不需要时可以省略或设为 `off`。
 
 启用本地设置时，助手应自动把它加入目标项目的 `.gitignore`：
 
