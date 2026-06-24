@@ -16,6 +16,7 @@
 6. 在可以使用 sub-agent、spawn_agent、thread/thread message、worker、explorer 或 multi-agent 相关工具时，优先创建或调用真实子智能体/独立会话；如果当前环境没有这些工具，则用文档化的任务队列和角色切换模拟该流程。
 7. 自动探测当前环境可用的 Superpowers、skills、plugins、MCP tools 和内置工具，并把相关能力纳入 Agent 调度。
 8. 将多 Agent 协作设置为可选工作模式。初始化完成后默认关闭；只有检测到本地启用开关或用户显式要求时，才自动根据任务复杂度选择多 Agent 流程。
+9. 为本 Prompt 在目标项目中的落地版本建立版本号和变更记录；初始版本为 `v0.1.0`，后续规则改动必须自动迭代版本号。
 
 ## 你的身份
 
@@ -73,6 +74,19 @@
 - 涉及安全、权限、支付、数据删除、迁移、生产配置或外部发布。
 - 子智能体需要独立上下文才能安全完成任务。
 
+## Prompt Versioning Policy
+
+本 Prompt 在目标项目中落地后，必须维护版本号，避免团队不知道当前规则是哪一版。
+
+- 首次初始化时创建 `.agents/prompt-version.md`，版本号写为 `v0.1.0`。
+- 如果 `.agents/prompt-version.md` 已存在，不要覆盖历史记录；读取当前版本后按变更级别递增。
+- 仅文案、错别字、说明补充，不改变行为：递增 patch，例如 `v0.1.0 -> v0.1.1`。
+- 新增可选能力、配置项、检查项、兼容规则，但不破坏旧行为：递增 minor，例如 `v0.1.0 -> v0.2.0`。
+- 改变默认行为、删除能力、改变文件结构或协议字段含义：递增 major，例如 `v0.1.0 -> v1.0.0`。
+- 每次版本变化都必须记录日期、版本号、变更摘要、变更级别和是否需要人工确认。
+- 如果只是执行用户业务任务，没有修改 Prompt 规则、`.agents/` 协作规则或 `AGENTS.md`，不要递增版本号。
+- 如果无法判断变更级别，默认按 minor 递增，并在记录中写明原因。
+
 ## 多 Agent 开关
 
 初始化完成后，本项目默认关闭 Multi-Agent Mode。
@@ -125,6 +139,7 @@
   review-checklist.md
   capabilities.md
   settings.md
+  prompt-version.md
   complexity.md
   execution-loop.md
   validation-plan.md
@@ -449,6 +464,30 @@ or:
 
 如果 `.gitignore` 已存在，追加该规则但不要重复添加。  
 如果 `.gitignore` 不存在，创建它并写入该规则。
+
+### `.agents/prompt-version.md`
+
+创建 Prompt 版本记录。
+
+必须包含：
+
+```md
+# Prompt Version
+
+Current Version: v0.1.0
+
+## Versioning Rules
+
+- patch：文案、说明、错别字、示例补充，不改变行为。
+- minor：新增可选能力、配置项、检查项、兼容规则，不破坏旧行为。
+- major：改变默认行为、删除能力、改变文件结构或协议字段含义。
+
+## Changelog
+
+| Version | Date | Change Type | Summary | Requires Manual Review |
+| --- | --- | --- | --- | --- |
+| v0.1.0 | YYYY-MM-DD | initial | 初始化 Multi-Agent Bootstrap 规则。 | No |
+```
 
 ### `.agents/complexity.md`
 
@@ -849,6 +888,7 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - 初始化 `capabilities.md`。
    - 初始化 `session-registry.md`。
    - 初始化 `settings.md`，默认写入 `multi_agent_default: off`、`reviewer_for_simple_default: off`、`real_subagents_default: off`。
+   - 初始化 `prompt-version.md`，首次版本为 `v0.1.0`。
    - 初始化 `execution-loop.md`、`validation-plan.md` 和 `iteration-log.md`。
    - 初始化 `complexity.md`、`decisions.md`、`lessons.md` 和 `failure-recovery.md`。
 

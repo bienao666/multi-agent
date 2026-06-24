@@ -32,6 +32,7 @@ AI 编程助手会自动：
 - 探测当前环境可用的 Superpowers、agent-skills、skills、plugins、MCP tools 和项目本地工具。
 - 如果存在 agent-skills，自动按工程生命周期调用相关能力。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
+- 创建 `.agents/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
 - 创建 `.agents/execution-loop.md`、`.agents/validation-plan.md`、`.agents/iteration-log.md`、`.agents/lifecycle-loop.md`，让任务按生命周期循环推进。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
@@ -46,6 +47,17 @@ AI 编程助手会自动：
 - 简单任务默认由 Manager 精简处理和自检，不输出完整三段式报告。
 - Builder / Reviewer / sub-agent 只接收最小必要上下文。
 - 复杂任务、高风险任务、Reviewer 未通过或用户要求详细记录时，才进入完整上下文模式。
+
+## 版本号规则
+
+初始化后会生成 `.agents/prompt-version.md`：
+
+- 初始版本：`v0.1.0`
+- 文案或说明补充：递增 patch，例如 `v0.1.1`
+- 新增可选能力、配置项、兼容规则或 agent-skills 路由：递增 minor，例如 `v0.2.0`
+- 改变默认行为、删除能力或改变协议结构：递增 major，例如 `v1.0.0`
+
+只有修改多 Agent Prompt 规则、`.agents/` 协作规则、agent-skills 路由或 `AGENTS.md` 时才递增版本；普通业务开发任务不递增。
 
 ## 从旧版本升级
 
@@ -77,6 +89,7 @@ AI 编程助手会自动：
 - Manager / Builder / Reviewer 输出字段是否已中文化。
 - agent-skills 路由是否包含 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/webperf`、`/code-simplify`、`/ship`。
 - 是否包含 Token Budget Policy，避免每次任务全量读取 `.agents/` 或 agent-skills 技能库。
+- 是否包含 `.agents/prompt-version.md`，并能在后续规则变动时自动递增版本号。
 
 建议让 AI 最后给出：
 

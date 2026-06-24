@@ -19,6 +19,7 @@
 ```text
 .work-context/
   index.md
+  version.md
   people/
   projects/
   events/
@@ -29,6 +30,7 @@
 说明：
 
 - `index.md`：上下文入口索引，记录重点项目、常用人物、常用模板和最近事件。
+- `version.md`：记录 Work Context System 在当前项目中的 Prompt 版本和变更历史。
 - `people/`：人物画像，记录领导、客户、同事、协作方的关注点和表达偏好。
 - `projects/`：项目库，记录项目背景、目标、进展、关键风险和当前待办。
 - `events/`：事件库，记录会议、沟通、决策、冲突、变更和历史上下文。
@@ -41,6 +43,38 @@
 - `privacy-and-sanitization.md`
 - `operating-playbook.md`
 - `templates/question-simulation.md`
+
+## 版本管理
+
+本 Work Context System 在目标项目中落地后，必须维护版本号。
+
+- 首次初始化时创建 `.work-context/version.md`，版本号写为 `v0.1.0`。
+- 如果 `.work-context/version.md` 已存在，不要覆盖历史记录；读取当前版本后按变更级别递增。
+- 仅文案、错别字、说明补充，不改变行为：递增 patch，例如 `v0.1.0 -> v0.1.1`。
+- 新增可选模板、目录、字段、维护流程或兼容规则，但不破坏旧行为：递增 minor，例如 `v0.1.0 -> v0.2.0`。
+- 改变默认目录结构、删除能力、改变隐私规则或核心工作流：递增 major，例如 `v0.1.0 -> v1.0.0`。
+- 每次版本变化都必须记录日期、版本号、变更摘要、变更级别和是否需要人工确认。
+- 如果只是新增人物、项目、事件或产出内容，没有修改系统规则和模板结构，不要递增版本号。
+
+`.work-context/version.md` 初始内容：
+
+```md
+# Work Context Version
+
+Current Version: v0.1.0
+
+## Versioning Rules
+
+- patch：文案、说明、错别字、示例补充，不改变行为。
+- minor：新增可选模板、目录、字段、维护流程或兼容规则，不破坏旧行为。
+- major：改变默认目录结构、删除能力、改变隐私规则或核心工作流。
+
+## Changelog
+
+| Version | Date | Change Type | Summary | Requires Manual Review |
+| --- | --- | --- | --- | --- |
+| v0.1.0 | YYYY-MM-DD | initial | 初始化 Work Context System。 | No |
+```
 
 ## 人物库
 
@@ -294,6 +328,7 @@ YYYY-MM-DD
 
 ```text
 请根据这份 Work Context System 文档，在当前项目中创建 .work-context/ 目录，并初始化 people、projects、events、templates、outputs 五个子目录。
+同时创建 .work-context/version.md，初始版本号为 v0.1.0；后续如果修改系统规则或模板结构，按版本管理规则自动递增版本号。
 ```
 
 ### 从材料提取人物画像

@@ -6,6 +6,8 @@
 
 每个目录都是一个独立能力包。进入对应目录后，阅读该目录的 `README.md`，再把其中的 Markdown 文档复制到目标项目或 AI 助手会话中执行。
 
+各能力包初始化后都会写入自己的版本记录文件。初始版本统一为 `v0.1.0`；后续如果 AI 修改 Prompt 规则、目录结构、协作协议或模板结构，必须自动按 patch / minor / major 规则递增版本号并记录变更。普通业务任务或新增内容资料不递增版本。
+
 ## 目录说明
 
 | 目录 | 功能 | 适合场景 | 默认状态 |
@@ -67,3 +69,12 @@ real_subagents: on
 ```
 
 如果目标项目没有 `.gitignore`，助手应创建一个并写入该规则。这样可以把多 Agent 协作模板提交到仓库，但不会强制所有同事启用。
+
+## 版本记录文件
+
+| 能力包 | 目标项目中的版本文件 | 初始版本 | 何时递增 |
+| --- | --- | --- | --- |
+| `multi-agent-superpowers` | `.agents/prompt-version.md` | `v0.1.0` | 修改多 Agent 规则、`.agents/` 协作规则或 `AGENTS.md` |
+| `multi-agent-superpowers-agentskills` | `.agents/prompt-version.md` | `v0.1.0` | 修改多 Agent 规则、agent-skills 路由、`.agents/` 协作规则或 `AGENTS.md` |
+| `work-context-system` | `.work-context/version.md` | `v0.1.0` | 修改上下文系统规则、目录结构、隐私规则或模板结构 |
+| `vibe-coding-preflight` | `docs/prompt-version.md` | `v0.1.0` | 修改 Preflight 规则、`docs/` 准备结构或 README 入口 |

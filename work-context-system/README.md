@@ -29,6 +29,7 @@
 
 ```text
 .work-context/
+  version.md
   people/
   projects/
   events/
@@ -41,6 +42,7 @@
 | 文件 | 作用 |
 | --- | --- |
 | `work-context-system.md` | 主指南，定义人物库、项目库、事件库、产出模板库。 |
+| `.work-context/version.md` | 初始化后生成，记录当前系统版本和变更历史。 |
 | `index-template.md` | `.work-context/index.md` 模板，让 AI 先读索引再按需读取上下文。 |
 | `privacy-and-sanitization.md` | 隐私和脱敏规则，避免把敏感职场信息直接交给 AI。 |
 | `operating-playbook.md` | 日常运行手册，说明什么时候更新各类上下文。 |
@@ -53,10 +55,21 @@
 ```text
 请完整读取并执行下面这份 Work Context System 文档。
 在当前目录中初始化 .work-context/，并创建 people、projects、events、templates、outputs 子目录。
-同时创建 .work-context/index.md，并参考隐私脱敏规则和运行手册建立维护流程。
+同时创建 .work-context/index.md 和 .work-context/version.md，并参考隐私脱敏规则和运行手册建立维护流程。
 ```
 
 接着把 `work-context-system.md` 的全文粘贴进去。
+
+## 版本号规则
+
+初始化后会生成 `.work-context/version.md`：
+
+- 初始版本：`v0.1.0`
+- 文案或说明补充：递增 patch，例如 `v0.1.1`
+- 新增可选模板、目录、字段或维护流程：递增 minor，例如 `v0.2.0`
+- 改变默认目录结构、删除能力、改变隐私规则或核心工作流：递增 major，例如 `v1.0.0`
+
+只有修改 Work Context System 规则或模板结构时才递增版本；新增人物、项目、事件或产出内容不递增。
 
 ## 常用工作流
 

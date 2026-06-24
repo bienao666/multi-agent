@@ -22,7 +22,8 @@
 8. 建立基础项目文档。
 9. 检查或初始化 Git 仓库。
 10. 定义后续 AI 协作角色，直接参考 Manager / Builder / Reviewer 模式。
-11. 完成准备后，再询问用户是否进入编码阶段。
+11. 建立 Prompt 版本记录，初始版本为 `v0.1.0`，后续规则改动自动迭代版本号。
+12. 完成准备后，再询问用户是否进入编码阶段。
 
 ## 工作原则
 
@@ -52,6 +53,19 @@
 - 存在高风险技术选择、外部依赖、数据安全或生产发布问题。
 - 发现已有文档之间互相冲突，需要解释取舍。
 
+## Prompt Versioning Policy
+
+本 Preflight Prompt 在目标项目中落地后，必须维护版本号，避免后续准备流程变化无法追踪。
+
+- 首次初始化时创建 `docs/prompt-version.md`，版本号写为 `v0.1.0`。
+- 如果 `docs/prompt-version.md` 已存在，不要覆盖历史记录；读取当前版本后按变更级别递增。
+- 仅文案、错别字、说明补充，不改变行为：递增 patch，例如 `v0.1.0 -> v0.1.1`。
+- 新增可选文档、检查项、准备步骤或兼容规则，但不破坏旧行为：递增 minor，例如 `v0.1.0 -> v0.2.0`。
+- 改变默认流程、删除准备步骤、改变文档结构或进入编码条件：递增 major，例如 `v0.1.0 -> v1.0.0`。
+- 每次版本变化都必须记录日期、版本号、变更摘要、变更级别和是否需要人工确认。
+- 如果只是执行具体项目开发任务，没有修改 Preflight 规则、`docs/` 准备结构或 README 入口，不要递增版本号。
+- 如果无法判断变更级别，默认按 minor 递增，并在记录中写明原因。
+
 ## 建议目录结构
 
 请在项目根目录创建或更新：
@@ -66,6 +80,7 @@ docs/
   execution-loop.md
   architecture.md
   agent-roles.md
+  prompt-version.md
   decisions.md
   task-log.md
 README.md
@@ -275,6 +290,30 @@ README.md
 - 如果后续项目安装了 `multi-agent-superpowers`，以 `.agents/` 中的角色定义为执行期准则。
 ```
 
+### `docs/prompt-version.md`
+
+记录 Preflight Prompt 版本。
+
+必须包含：
+
+```md
+# Prompt Version
+
+Current Version: v0.1.0
+
+## Versioning Rules
+
+- patch：文案、说明、错别字、示例补充，不改变行为。
+- minor：新增可选文档、检查项、准备步骤或兼容规则，不破坏旧行为。
+- major：改变默认流程、删除准备步骤、改变文档结构或进入编码条件。
+
+## Changelog
+
+| Version | Date | Change Type | Summary | Requires Manual Review |
+| --- | --- | --- | --- | --- |
+| v0.1.0 | YYYY-MM-DD | initial | 初始化 Vibe Coding Preflight 规则。 | No |
+```
+
 ### `docs/decisions.md`
 
 记录关键决策。
@@ -328,6 +367,7 @@ README 至少包含：
 - `docs/execution-loop.md`
 - `docs/architecture.md`
 - `docs/agent-roles.md`
+- `docs/prompt-version.md`
 - `docs/decisions.md`
 - `docs/task-log.md`
 ```
@@ -397,11 +437,16 @@ git init
    - 明确 Preflight 阶段由 Manager 主导，编码阶段再进入 Builder / Reviewer。
    - 写入 `docs/agent-roles.md`。
 
-10. **Git Check**
+10. **Prompt Version Setup**
+   - 如果 `docs/prompt-version.md` 不存在，创建并写入 `v0.1.0`。
+   - 如果已经存在，只有在 Preflight 规则或文档结构发生变化时才递增版本。
+   - 写入版本变更记录。
+
+11. **Git Check**
    - 检查 Git 状态。
    - 必要时询问是否初始化。
 
-11. **Preflight Summary**
+12. **Preflight Summary**
    - 汇总已创建或更新的文件。
    - 列出当前 MVP。
    - 列出第一个里程碑。
@@ -423,6 +468,7 @@ MVP:
 成功标准:
 验证方式:
 Git 状态:
+Prompt 版本:
 待确认问题:
 是否建议进入编码:
 ```
@@ -437,6 +483,7 @@ Git 状态:
 - 成功标准已定义。
 - 验证计划已定义。
 - 执行循环已定义。
+- Prompt 版本已记录。
 - 项目文档入口已建立。
 - Git 状态已检查。
 - 用户确认可以开始编码。

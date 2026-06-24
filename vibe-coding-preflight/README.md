@@ -38,6 +38,7 @@ AI 助手会自动：
 - 建立执行循环。
 - 建立初始架构说明。
 - 定义后续 AI 协作角色，并与 `multi-agent-superpowers` 的 Manager / Builder / Reviewer 模式保持一致。
+- 创建 `docs/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 检查 Git 状态。
 - 完成后询问是否进入编码阶段。
 
@@ -51,6 +52,17 @@ AI 助手会自动：
 - Preflight Summary 默认输出精简摘要。
 - 只有准备进入编码、高风险决策或用户要求详细版时，才展开完整细节。
 
+## 版本号规则
+
+初始化后会生成 `docs/prompt-version.md`：
+
+- 初始版本：`v0.1.0`
+- 文案或说明补充：递增 patch，例如 `v0.1.1`
+- 新增可选文档、检查项或准备步骤：递增 minor，例如 `v0.2.0`
+- 改变默认流程、删除准备步骤或改变进入编码条件：递增 major，例如 `v1.0.0`
+
+只有修改 Preflight 规则、`docs/` 准备结构或 README 入口时才递增版本；普通业务开发任务不递增。
+
 ## 生成的文档结构
 
 ```text
@@ -63,6 +75,7 @@ docs/
   execution-loop.md
   architecture.md
   agent-roles.md
+  prompt-version.md
   decisions.md
   task-log.md
 README.md
