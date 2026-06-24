@@ -18,6 +18,7 @@
 
 ```text
 .work-context/
+  index.md
   people/
   projects/
   events/
@@ -27,20 +28,28 @@
 
 说明：
 
+- `index.md`：上下文入口索引，记录重点项目、常用人物、常用模板和最近事件。
 - `people/`：人物画像，记录领导、客户、同事、协作方的关注点和表达偏好。
 - `projects/`：项目库，记录项目背景、目标、进展、关键风险和当前待办。
 - `events/`：事件库，记录会议、沟通、决策、冲突、变更和历史上下文。
 - `templates/`：产出模板，定义汇报、方案、复盘、技术分析等固定格式。
 - `outputs/`：可选，保存 AI 生成后的最终产出或历史版本。
 
+初始化时可以参考：
+
+- `index-template.md`
+- `privacy-and-sanitization.md`
+- `operating-playbook.md`
+- `templates/question-simulation.md`
+
 ## 人物库
 
 路径示例：
 
 ```text
-.work-context/people/boss-某总.md
-.work-context/people/client-某客户.md
-.work-context/people/teammate-产品A.md
+.work-context/people/leader-direct.md
+.work-context/people/client-decision-maker.md
+.work-context/people/teammate-product.md
 ```
 
 模板：
@@ -190,7 +199,7 @@ YYYY-MM-DD
 路径示例：
 
 ```text
-.work-context/templates/boss-report.md
+.work-context/templates/leader-report.md
 .work-context/templates/tech-diff-report.md
 .work-context/templates/review-summary.md
 .work-context/templates/meeting-minutes.md
@@ -336,8 +345,9 @@ YYYY-MM-DD
 
 - 不要让 AI 凭空猜人物画像，要尽量来自会议纪要、聊天记录、邮件和历史反馈。
 - 敏感信息进入 AI 前应先脱敏。
+- 每次任务开始时先读 `.work-context/index.md`，再按需读取相关文件，不要默认读取整个目录。
 - 人物画像不是评价人，而是记录工作协作中的表达偏好和决策关注点。
 - 每次重要会议或反馈后，更新事件库和人物库。
 - 模板越稳定，AI 产出越稳定。
 - 先生成标准版，再按对象改写，效果通常更好。
-
+- 重要材料生成后，使用追问模拟模板预判对方可能提出的问题。

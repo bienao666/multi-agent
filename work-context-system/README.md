@@ -3,6 +3,10 @@
 这个目录提供一份“AI 工作上下文系统”模板：
 
 - `work-context-system.md`
+- `index-template.md`
+- `privacy-and-sanitization.md`
+- `operating-playbook.md`
+- `templates/question-simulation.md`
 
 它用于把 AI 从临时写作工具升级成更懂你工作场景的助手。核心是建立四类长期可复用资料：
 
@@ -32,6 +36,16 @@
   outputs/
 ```
 
+## 文件说明
+
+| 文件 | 作用 |
+| --- | --- |
+| `work-context-system.md` | 主指南，定义人物库、项目库、事件库、产出模板库。 |
+| `index-template.md` | `.work-context/index.md` 模板，让 AI 先读索引再按需读取上下文。 |
+| `privacy-and-sanitization.md` | 隐私和脱敏规则，避免把敏感职场信息直接交给 AI。 |
+| `operating-playbook.md` | 日常运行手册，说明什么时候更新各类上下文。 |
+| `templates/question-simulation.md` | 追问模拟模板，让 AI 预判领导、客户或协作方可能提出的问题。 |
+
 ## 使用方式
 
 在任意项目或知识库中打开 AI 编程助手或通用 AI 助手，然后发送：
@@ -39,6 +53,7 @@
 ```text
 请完整读取并执行下面这份 Work Context System 文档。
 在当前目录中初始化 .work-context/，并创建 people、projects、events、templates、outputs 子目录。
+同时创建 .work-context/index.md，并参考隐私脱敏规则和运行手册建立维护流程。
 ```
 
 接着把 `work-context-system.md` 的全文粘贴进去。
@@ -65,4 +80,3 @@
 - Work Context System 负责提供 AI 工作所需的长期上下文。
 
 组合使用时，可以让 Manager 在任务开始前读取 `.work-context/`，再决定如何分配任务。
-
