@@ -331,16 +331,17 @@ or:
 
     multi_agent: off
 
-`local-settings.md` should usually be ignored by version control because it represents personal workflow preference.
+`local-settings.md` must be ignored by version control because it represents personal workflow preference.
 ```
 
-同时，如果项目存在 `.gitignore`，建议追加：
+同时，必须自动确保项目根目录 `.gitignore` 包含：
 
 ```gitignore
 .agents/local-settings.md
 ```
 
-如果没有 `.gitignore`，不要强制创建，除非用户要求。
+如果 `.gitignore` 已存在，追加该规则但不要重复添加。  
+如果 `.gitignore` 不存在，创建它并写入该规则。
 
 ### `.agents/complexity.md`
 

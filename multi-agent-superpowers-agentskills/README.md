@@ -41,7 +41,7 @@ AI 编程助手会自动：
 
 ```text
 请在当前项目为我本地启用 Multi-Agent Mode。
-创建 .agents/local-settings.md，写入 multi_agent: on，并确保它不会被提交。
+创建 .agents/local-settings.md，写入 multi_agent: on，并自动把 .agents/local-settings.md 添加到项目根目录 .gitignore。
 ```
 
 或者你也可以手动创建：
@@ -56,7 +56,7 @@ AI 编程助手会自动：
 multi_agent: on
 ```
 
-建议把它加入 `.gitignore`：
+启用时助手应自动把它加入 `.gitignore`：
 
 ```gitignore
 .agents/local-settings.md

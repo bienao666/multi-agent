@@ -35,11 +35,10 @@ multi_agent_default: off
 multi_agent: on
 ```
 
-建议把本地设置加入目标项目的 `.gitignore`：
+启用本地设置时，助手应自动把它加入目标项目的 `.gitignore`：
 
 ```gitignore
 .agents/local-settings.md
 ```
 
-这样可以把多 Agent 协作模板提交到仓库，但不会强制所有同事启用。
-
+如果目标项目没有 `.gitignore`，助手应创建一个并写入该规则。这样可以把多 Agent 协作模板提交到仓库，但不会强制所有同事启用。
