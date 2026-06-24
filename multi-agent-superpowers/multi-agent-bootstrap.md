@@ -116,12 +116,12 @@ AGENTS.md
 ```md
 ## Manager Decision
 
-Task ID:
-Goal:
-Assigned To:
-Reason:
-Acceptance Criteria:
-Next Step:
+任务编号:
+目标:
+分配给:
+原因:
+验收标准:
+下一步:
 ```
 
 ### `.agents/builder.md`
@@ -139,13 +139,13 @@ Next Step:
 ```md
 ## Builder Report
 
-Task ID:
-Status:
-Changed Files:
-Implementation Notes:
-Tests Run:
-Risks:
-Questions:
+任务编号:
+状态:
+修改文件:
+实现说明:
+已运行测试:
+风险:
+问题:
 ```
 
 ### `.agents/reviewer.md`
@@ -162,12 +162,12 @@ Questions:
 ```md
 ## Review Result
 
-Task ID:
-Decision: Pass | Needs Changes
-Findings:
-Required Changes:
-Test Gaps:
-Residual Risks:
+任务编号:
+结论: Pass | Needs Changes
+发现:
+必须修改:
+测试缺口:
+剩余风险:
 ```
 
 ### `.agents/protocol.md`
@@ -179,50 +179,50 @@ Residual Risks:
 ```md
 # Task Assignment
 
-Task ID:
-From:
-To:
-Goal:
-Context:
-Constraints:
-Acceptance Criteria:
-Report Back To:
+任务编号:
+发送方:
+接收方:
+目标:
+上下文:
+约束:
+验收标准:
+回复给:
 ```
 
 ```md
 # Task Report
 
-Task ID:
-From:
-To:
-Status:
-Changed:
-Tests:
-Risks:
-Questions:
+任务编号:
+发送方:
+接收方:
+状态:
+变更:
+测试:
+风险:
+问题:
 ```
 
 ```md
 # Review Request
 
-Task ID:
-From:
-To:
-Scope:
-Changed Files:
-Focus Areas:
-Acceptance Criteria:
+任务编号:
+发送方:
+接收方:
+范围:
+修改文件:
+关注点:
+验收标准:
 ```
 
 ```md
 # Review Response
 
-Task ID:
-From:
-To:
-Decision:
-Findings:
-Required Changes:
+任务编号:
+发送方:
+接收方:
+结论:
+发现:
+必须修改:
 ```
 
 ### `.agents/task-log.md`
@@ -232,7 +232,7 @@ Required Changes:
 ```md
 # Task Log
 
-| Task ID | Status | Owner | Summary | Created | Updated | Notes |
+| 任务编号 | 状态 | 负责人 | 摘要 | 创建时间 | 更新时间 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
 ```
 
@@ -609,9 +609,9 @@ When enabled, the user should be able to ask naturally. Do not require phrases l
    - 如果匹配度高，Manager 必须在任务分配中写明：
 
 ```md
-Capability:
-Reason:
-Fallback:
+能力:
+原因:
+降级方案:
 ```
 
 3. **按角色调用**
@@ -626,7 +626,7 @@ Fallback:
 
 ```md
 Using capability: <name>
-Reason: <why this capability fits>
+原因: <为什么该能力适合当前任务>
 ```
 
 5. **不可用时降级**
