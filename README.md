@@ -1,4 +1,4 @@
-# More Agents
+# Multi Agents
 
 这个仓库收集可复制到项目中的多 Agent 协作启动模板。目标是让 AI 编程助手在项目里建立可选的 Manager / Builder / Reviewer 协作机制，同时保持默认关闭，避免影响不想启用该流程的团队成员。
 
