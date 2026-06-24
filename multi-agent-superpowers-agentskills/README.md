@@ -30,7 +30,7 @@ AI 编程助手会自动：
 - 建立任务协议、任务日志、验收清单和失败恢复流程。
 - 探测当前环境可用的 Superpowers、agent-skills、skills、plugins、MCP tools 和项目本地工具。
 - 如果存在 agent-skills，自动按工程生命周期调用相关能力。
-- 创建 `.agents/settings.md`，默认 `multi_agent_default: off`。
+- 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
@@ -54,7 +54,7 @@ AI 编程助手会自动：
 
 升级时重点检查：
 
-- `.agents/settings.md` 是否包含带注释的 `multi_agent_default` 和 `reviewer_for_simple_default`。
+- `.agents/settings.md` 是否包含带注释的 `multi_agent_default`、`reviewer_for_simple_default` 和 `real_subagents_default`。
 - `.agents/local-settings.md` 是否已加入 `.gitignore`。
 - `.agents/session-registry.md` 是否存在。
 - `.agents/agent-skills.md` 是否存在并包含 lifecycle routing。
@@ -106,6 +106,9 @@ multi_agent: on
 
 #### 简单任务也启用 Reviewer 复核
 reviewer_for_simple: on
+
+#### 明确授权自动创建真实 sub-agent
+real_subagents: on
 ```
 
 启用时助手应自动把它加入 `.gitignore`：
@@ -183,6 +186,9 @@ multi_agent_default: off
 
 #### 简单任务默认不启用 Reviewer
 reviewer_for_simple_default: off
+
+#### 默认不预授权真实 sub-agent；需要本地开启后才可自动创建 Builder / Reviewer
+real_subagents_default: off
 ```
 
 个人本地开启：
@@ -194,6 +200,9 @@ multi_agent: on
 
 #### 本地启用简单任务 Reviewer
 reviewer_for_simple: on
+
+#### 本地授权真实 sub-agent 自动创建
+real_subagents: on
 ```
 
 个人本地关闭：
@@ -205,6 +214,9 @@ multi_agent: off
 
 #### 本地关闭简单任务 Reviewer
 reviewer_for_simple: off
+
+#### 本地关闭真实 sub-agent 自动创建
+real_subagents: off
 ```
 
 当前消息也可以临时控制：

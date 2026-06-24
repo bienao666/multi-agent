@@ -38,6 +38,9 @@ multi_agent_default: off
 
 #### 简单任务默认不启用 Reviewer
 reviewer_for_simple_default: off
+
+#### 默认不预授权真实 sub-agent；需要本地开启后才可自动创建 Builder / Reviewer
+real_subagents_default: off
 ```
 
 个人本地启用：
@@ -49,9 +52,13 @@ multi_agent: on
 
 #### 本地启用简单任务 Reviewer 复核
 reviewer_for_simple: on
+
+#### 本地授权真实 sub-agent 自动创建
+real_subagents: on
 ```
 
 其中 `reviewer_for_simple: on` 表示简单任务也会启用 Reviewer 复核；不需要时可以省略或设为 `off`。
+其中 `real_subagents: on` 表示如果客户端开放 `spawn_agent` / `sub-agent` 工具，Manager 可以自动创建真实 Builder / Reviewer 子智能体。
 
 启用本地设置时，助手应自动把它加入目标项目的 `.gitignore`：
 

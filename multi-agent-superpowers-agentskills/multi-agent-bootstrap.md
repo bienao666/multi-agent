@@ -360,6 +360,11 @@ multi_agent_default: off
 #### on：简单任务也进入 Manager + Reviewer 流程。
 reviewer_for_simple_default: off
 
+#### 是否在项目级默认授权使用真实 sub-agent / spawn_agent 工具。
+#### off：默认不自动创建真实 sub-agent，适合提交到团队仓库。
+#### on：如果客户端开放 sub-agent 工具，Manager 可以自动创建真实 Builder / Reviewer 子智能体。
+real_subagents_default: off
+
 ## Meaning
 
 - `off`: Multi-Agent Mode is available but not enabled by default.
@@ -381,6 +386,11 @@ Individual developers may create `.agents/local-settings.md`:
     #### off：简单任务只由 Manager 自检。
     reviewer_for_simple: on
 
+    #### 是否允许当前开发者本地自动创建真实 sub-agent。
+    #### on：明确授权 Manager 使用 spawn_agent / sub-agent 工具创建 Builder / Reviewer。
+    #### off：不自动创建真实 sub-agent。
+    real_subagents: on
+
 or:
 
     #### 本地关闭多 Agent 协作模式。
@@ -388,6 +398,9 @@ or:
 
     #### 本地关闭简单任务 Reviewer 复核。
     reviewer_for_simple: off
+
+    #### 本地关闭真实 sub-agent 自动创建。
+    real_subagents: off
 
 `local-settings.md` must be ignored by version control because it represents personal workflow preference.
 ```
@@ -669,6 +682,7 @@ This project uses a Manager / Builder / Reviewer workflow.
 - Multi-Agent Mode is available but disabled by default.
 - Check `.agents/settings.md` and `.agents/local-settings.md` before deciding whether to use it.
 - Check `reviewer_for_simple_default` and `reviewer_for_simple` before deciding whether simple tasks require Reviewer.
+- Check `real_subagents_default` and `real_subagents` before deciding whether real sub-agents may be spawned automatically.
 - If enabled, users do not need to explicitly ask for the Manager / Builder / Reviewer workflow.
 - If disabled, handle requests normally while still respecting project rules and safety boundaries.
 
@@ -698,11 +712,12 @@ For every new user request:
 
 1. Check whether Multi-Agent Mode is enabled.
 2. Check whether Reviewer is enabled for simple tasks.
-3. If enabled, treat the request as entering the Manager intake queue.
-4. If enabled, classify complexity.
-5. If enabled, check relevant capabilities, including agent-skills when available.
-6. If enabled, choose the workflow automatically.
-7. If disabled, proceed with normal single-agent handling.
+3. Check whether real sub-agents are authorized.
+4. If enabled, treat the request as entering the Manager intake queue.
+5. If enabled, classify complexity.
+6. If enabled, check relevant capabilities, including agent-skills when available.
+7. If enabled, choose the workflow automatically.
+8. If disabled, proceed with normal single-agent handling.
 
 When enabled, the user should be able to ask naturally. Do not require phrases like "use multi-agent mode" or "use Manager / Builder / Reviewer".
 
@@ -840,7 +855,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 初始化 `task-log.md`。
    - 初始化 `capabilities.md`。
    - 初始化 `session-registry.md`。
-   - 初始化 `settings.md`，默认写入 `multi_agent_default: off`。
+   - 初始化 `settings.md`，默认写入 `multi_agent_default: off`、`reviewer_for_simple_default: off`、`real_subagents_default: off`。
    - 初始化 `agent-skills.md`。
    - 初始化 `complexity.md`、`decisions.md`、`lessons.md` 和 `failure-recovery.md`。
 
@@ -883,9 +898,10 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 ## 调度规则
 
-如果 Multi-Agent Mode 已启用，且当前客户端开放了 sub-agent、spawn_agent、worker、explorer、delegate 或类似子智能体工具：
+如果 Multi-Agent Mode 已启用，且 `real_subagents` 或 `real_subagents_default` 为 `on`，且当前客户端开放了 sub-agent、spawn_agent、worker、explorer、delegate 或类似子智能体工具：
 
 - Manager 必须优先使用客户端原生 sub-agent 工具创建真实子智能体。
+- 只有 `real_subagents: on` 或项目显式配置 `real_subagents_default: on` 时，才视为用户对真实 sub-agent 自动创建的明确授权。
 - Builder 类型任务优先创建 `worker` 子智能体。
 - Reviewer / Explorer 类型任务优先创建 `explorer`、`reviewer` 或最接近的只读审查子智能体。
 - 每个子智能体必须接收明确、狭窄、可完成的任务。
@@ -900,6 +916,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 如果 Multi-Agent Mode 已启用，且当前 Agent 环境支持创建新 thread、发送消息到其他 thread、创建 subagent、worker、child session 或类似工具：
 
 - Manager 必须优先使用真实独立 Agent 或独立会话。
+- 如果 `real_subagents` 明确为 `off`，不要使用 spawn_agent / 原生 sub-agent，只可使用普通 thread 或同会话模拟。
 - Manager 负责创建或复用 Builder 会话和 Reviewer 会话。
 - Builder 和 Reviewer 应运行在独立上下文中。
 - Manager 负责把必要上下文转发给它们，而不是让它们读取无关内容。
