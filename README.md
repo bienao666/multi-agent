@@ -1,8 +1,10 @@
-# Multi Agents
+# AI Agent Playbook
 
-这个仓库收集可复制到项目中的多 Agent 协作启动模板。目标是让 AI 编程助手在项目里建立可选的 Manager / Builder / Reviewer 协作机制，同时保持默认关闭，避免影响不想启用该流程的团队成员。
+这个仓库收集可复制到项目中的 AI 使用技巧、工作流模板和 Agent 协作方法。目标是把零散的 AI 使用经验沉淀成可复用的 Markdown Playbook，方便在不同项目、不同工具和不同工作场景中快速启用。
 
-每个目录都是一个独立版本。进入对应目录后，阅读该目录的 `README.md`，再把其中的 `multi-agent-bootstrap.md` 复制到目标项目的 AI 编程助手会话中执行。
+当前内容包括多 Agent 协作、Superpowers / skills 自动调用、agent-skills 生命周期路由，以及 AI 工作上下文系统。后续也可以继续扩展更多 AI 编程、办公、知识管理、自动化和团队协作技巧。
+
+每个目录都是一个独立能力包。进入对应目录后，阅读该目录的 `README.md`，再把其中的 Markdown 文档复制到目标项目或 AI 助手会话中执行。
 
 ## 目录说明
 
@@ -17,8 +19,8 @@
 1. 选择一个目录。
 2. 打开该目录的 `README.md`。
 3. 在目标项目中打开 AI 编程助手或 Agent 会话。
-4. 按目录 README 的说明，把 `multi-agent-bootstrap.md` 全文喂给助手。
-5. 让助手把规则写入目标项目的 `AGENTS.md` 和 `.agents/`。
+4. 按目录 README 的说明，把对应 Markdown 文档全文喂给助手。
+5. 让助手把规则、模板或上下文结构写入目标项目。
 
 如果选择 `work-context-system`，则按该目录 README 初始化 `.work-context/`，它不依赖 `.agents/` 或多 Agent 开关。
 
