@@ -36,6 +36,17 @@ AI 编程助手会自动：
 - 创建 `.agents/execution-loop.md`、`.agents/validation-plan.md`、`.agents/iteration-log.md`、`.agents/lifecycle-loop.md`，让任务按生命周期循环推进。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
+## Token 消耗优化
+
+新版默认采用“摘要优先、按需展开”的方式运行：
+
+- 初始化时仍创建完整规则文件，不影响功能。
+- 日常任务只读取开关、任务日志、相关规则和当前生命周期阶段，不每次全量读取 `.agents/`。
+- agent-skills 只加载当前阶段匹配的 skill 或 slash command，不全量读取技能库。
+- 简单任务默认由 Manager 精简处理和自检，不输出完整三段式报告。
+- Builder / Reviewer / sub-agent 只接收最小必要上下文。
+- 复杂任务、高风险任务、Reviewer 未通过或用户要求详细记录时，才进入完整上下文模式。
+
 ## 从旧版本升级
 
 如果你的项目以前已经使用过旧版 `multi-agent-bootstrap.md`，不要手动删除旧的 `.agents/` 或 `AGENTS.md`。
@@ -65,6 +76,7 @@ AI 编程助手会自动：
 - 是否支持 `reviewer_for_simple`，让简单任务也可选进入 Reviewer。
 - Manager / Builder / Reviewer 输出字段是否已中文化。
 - agent-skills 路由是否包含 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/webperf`、`/code-simplify`、`/ship`。
+- 是否包含 Token Budget Policy，避免每次任务全量读取 `.agents/` 或 agent-skills 技能库。
 
 建议让 AI 最后给出：
 

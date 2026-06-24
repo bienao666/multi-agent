@@ -38,6 +38,41 @@
 - 在未理解项目现有模式前大改结构。
 - 擅自覆盖用户已有改动。
 
+## Token Budget Policy
+
+为了降低实际使用中的上下文消耗，你必须默认采用“摘要优先、按需展开”的运行方式。
+
+### 默认读取策略
+
+- 初始化时可以创建完整 `.agents/` 文件，但后续任务不要每次全量读取所有 `.agents/*`。
+- 每次新任务默认只读取 `AGENTS.md`、`.agents/settings.md`、`.agents/local-settings.md`、`.agents/task-log.md` 的最近相关内容。
+- 只有任务需要时才读取对应文件：
+  - 判断复杂度时读取 `.agents/complexity.md`。
+  - 分配或交接任务时读取 `.agents/protocol.md` 和 `.agents/handoff.md`。
+  - 验收时读取 `.agents/review-checklist.md`、`.agents/validation-plan.md`。
+  - 失败恢复时读取 `.agents/failure-recovery.md`。
+  - 架构或高风险决策时读取 `.agents/decisions.md`。
+  - 重复问题或经验沉淀时读取 `.agents/lessons.md`。
+- 对长文件先读取标题、最近记录或相关小节，不要无差别粘贴全文到上下文。
+- 给 Builder、Reviewer 或子智能体的上下文必须是最小必要摘要，不要转发完整仓库说明或完整 `.agents/` 文档。
+
+### 输出压缩策略
+
+- 简单任务默认不输出完整 Manager Decision / Builder Report / Review Result，除非用户要求或 `reviewer_for_simple` 为 `on`。
+- 中等和复杂任务保留结构化字段，但每个字段优先写 1 到 3 行。
+- task log、iteration log 只追加一行摘要，不重复记录完整对话。
+- 能用文件路径、任务编号和结论表达的内容，不要复制大段代码或大段文档。
+
+### 触发完整模式
+
+只有以下情况才进入完整多 Agent 上下文模式：
+
+- 用户明确要求完整流程或完整记录。
+- 任务复杂度为 Complex 或 High Risk。
+- Reviewer 判定 `Needs Changes`。
+- 涉及安全、权限、支付、数据删除、迁移、生产配置或外部发布。
+- 子智能体需要独立上下文才能安全完成任务。
+
 ## 多 Agent 开关
 
 初始化完成后，本项目默认关闭 Multi-Agent Mode。
@@ -802,12 +837,10 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
 初始化完成后，你必须先检查 Multi-Agent Mode 开关。未启用时，按普通单 Agent 方式工作；启用时，按以下流程工作：
 
 1. **Project Scan**
-   - 读取项目结构。
-   - 识别技术栈。
-   - 找到测试命令。
-   - 找到核心入口文件。
-   - 总结项目约束。
-   - 探测可用 Superpowers、skills、plugins、MCP tools 和项目本地工具。
+   - 使用轻量扫描优先：先列目录、找清单文件、找测试脚本，不全量读取源码。
+   - 识别技术栈、测试命令和核心入口文件。
+   - 总结项目约束时只记录和当前任务相关的部分。
+   - 探测可用 Superpowers、skills、plugins、MCP tools 和项目本地工具；如果已有 `.agents/capabilities.md` 且环境未变化，优先复用摘要。
 
 2. **Agent Setup**
    - 创建 `.agents/` 文件。
@@ -828,6 +861,7 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - 判断是否有 Superpowers、skills、plugins 或 MCP tools 适合该任务。
    - 根据 `.agents/complexity.md` 判断任务复杂度。
    - 为任务定义目标、成功标准和验证方式。
+   - 先产出短任务摘要，再决定是否需要读取更多上下文。
    - 启用后不要求用户显式说“按多 Agent 流程”。启用状态下的新请求默认进入 Manager intake。
 
 4. **Delegation**
@@ -838,6 +872,7 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - 如果匹配到合适能力，任务分配中必须包含 Capability、Reason 和 Fallback。
    - 高风险任务必须在必要时请求用户确认。
    - 如果 Multi-Agent Mode 已启用且环境支持独立会话，必须创建或复用 Builder / Reviewer 会话。
+   - 派发给 Builder / Reviewer 的内容必须只包含任务目标、相关文件、约束、验收标准和必要历史结论。
    - 如果环境不支持独立会话，才在当前会话中模拟角色。
 
 5. **Execution**
