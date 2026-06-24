@@ -31,6 +31,45 @@ AI 编程助手会自动：
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
+## 从旧版本升级
+
+如果你的项目以前已经使用过旧版 `multi-agent-bootstrap.md`，不要手动删除旧的 `.agents/` 或 `AGENTS.md`。
+
+在目标项目中打开 AI 编程助手，然后发送：
+
+```text
+请读取下面这份新版 Multi-Agent Bootstrap 文档，并对当前项目已有的 .agents/ 和 AGENTS.md 做兼容升级。
+要求：
+1. 不覆盖用户已有内容。
+2. 不删除旧任务日志、决策记录、经验记录。
+3. 只补齐缺失文件、缺失字段和新增规则。
+4. 如果同一规则已存在，只更新为新版语义，不重复追加。
+5. 升级完成后输出升级摘要。
+```
+
+然后粘贴新版 `multi-agent-bootstrap.md` 全文。
+
+升级时重点检查：
+
+- `.agents/settings.md` 是否包含带注释的 `multi_agent_default` 和 `reviewer_for_simple_default`。
+- `.agents/local-settings.md` 是否已加入 `.gitignore`。
+- `.agents/session-registry.md` 是否存在。
+- 协议字段是否包含 `目标会话` 和 `来源会话`。
+- 是否支持客户端原生 `sub-agent`、`spawn_agent`、`worker`、`explorer`。
+- 是否支持 `reviewer_for_simple`，让简单任务也可选进入 Reviewer。
+- Manager / Builder / Reviewer 输出字段是否已中文化。
+
+建议让 AI 最后给出：
+
+```md
+## Upgrade Summary
+
+已新增:
+已更新:
+保持不变:
+需要人工确认:
+```
+
 ## 初始化后怎么使用
 
 初始化完成后，多 Agent 协作默认关闭。你可以把这些规则提交到项目仓库，让团队共享，但每个人可以选择是否启用。
