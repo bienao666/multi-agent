@@ -31,6 +31,7 @@ AI 编程助手会自动：
 - 建立执行闭环、验证计划、迭代记录和 agent-skills 生命周期闭环。
 - 探测当前环境可用的 Superpowers、agent-skills、skills、plugins、MCP tools 和项目本地工具。
 - 如果存在 agent-skills，自动按工程生命周期调用相关能力。
+- 在任务需要时自动查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具辅助。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
 - 创建 `.agents/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
@@ -47,6 +48,18 @@ AI 编程助手会自动：
 - 简单任务默认由 Manager 精简处理和自检，不输出完整三段式报告。
 - Builder / Reviewer / sub-agent 只接收最小必要上下文。
 - 复杂任务、高风险任务、Reviewer 未通过或用户要求详细记录时，才进入完整上下文模式。
+
+## 按需能力发现
+
+任务涉及需求澄清、计划拆解、实现、测试、审查、安全、性能、浏览器验证、文档生成、图片/表格/PDF 处理或其他专业能力时，Manager 会自动查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具。
+
+查询原则：
+
+- agent-skills 只查当前生命周期阶段匹配的能力。
+- 只查当前任务相关能力，不全量加载技能库。
+- 找到合适能力时说明能力名称、使用原因和降级方案。
+- 没有合适能力时继续使用本地多 Agent 流程。
+- 不为了调用能力而扩大任务范围。
 
 ## 版本号规则
 

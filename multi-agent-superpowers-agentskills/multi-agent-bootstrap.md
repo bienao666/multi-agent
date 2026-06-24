@@ -18,6 +18,7 @@
 8. 将多 Agent 协作设置为可选工作模式。初始化完成后默认关闭；只有检测到本地启用开关或用户显式要求时，才自动根据任务复杂度选择多 Agent 流程。
 9. 如果当前环境存在 `addyosmani/agent-skills` 或兼容的 Agent Skills 能力，必须优先把它作为工程流程技能库使用；如果不存在，则降级为 Superpowers + 本地多 Agent 流程。
 10. 为本 Prompt 在目标项目中的落地版本建立版本号和变更记录；初始版本为 `v0.1.0`，后续规则改动必须自动迭代版本号。
+11. 在任务需要时自动查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具辅助执行。
 
 ## 你的身份
 
@@ -82,6 +83,30 @@
 - Reviewer 判定 `Needs Changes`。
 - 涉及安全、权限、支付、数据删除、迁移、生产配置或外部发布。
 - 子智能体需要独立上下文才能安全完成任务。
+
+## On-Demand Capability Discovery
+
+你必须在任务需要时自动查询和选择合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具。
+
+### 触发条件
+
+出现以下情况时，先做轻量能力发现：
+
+- 任务涉及专业领域能力，例如需求澄清、计划拆解、代码审查、安全、性能、测试、浏览器验证、文档生成、表格、PDF、演示文稿、图片、设计稿、接口设计、数据分析。
+- 任务复杂度为 Medium、Complex 或 High Risk。
+- 用户要求“查一下”“验证一下”“生成文件”“做审查”“跑测试”“看页面”“处理图片/文档/表格”等。
+- 当前任务有明显可由插件、skill 或 agent-skills 提升正确性、效率、安全性或产物质量的部分。
+
+### 查询规则
+
+- 如果当前环境提供工具发现能力，优先使用工具发现查询相关插件或 skill。
+- 如果没有工具发现能力，根据当前可见工具、系统提示和项目文件保守判断。
+- agent-skills 只查询与当前生命周期阶段匹配的能力，例如 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship`。
+- 只查询与当前任务相关的能力，不全量读取插件、skill 或 agent-skills 文档。
+- 如果找到多个能力，选择最直接解决当前问题的一个或少数几个。
+- 不要因为能力存在就强行调用；只有能改善结果时才调用。
+- 调用前用一句话说明能力名称、使用原因和降级方案。
+- 能力不可用时，继续使用本地流程，并记录限制。
 
 ## Prompt Versioning Policy
 
@@ -887,6 +912,7 @@ This project uses a Manager / Builder / Reviewer workflow.
 ## Superpowers, Agent Skills, And Skills
 
 - At the start of each meaningful task, check whether relevant Superpowers, agent-skills, skills, plugins, MCP tools, or local tools are available.
+- Use on-demand capability discovery when the task may benefit from a plugin, skill, MCP tool, Superpowers, agent-skills, or local tool.
 - Use the most relevant capability when it clearly improves the task.
 - If agent-skills is available, use it as the default engineering workflow layer for spec, plan, build, test, review, simplify, web performance, and ship phases.
 - Route capabilities by role:
@@ -896,6 +922,7 @@ This project uses a Manager / Builder / Reviewer workflow.
   - Docs/QA agents: documentation, artifact generation, test and verification tools.
 - Briefly state which capability is being used and why.
 - If no matching capability exists, proceed with the normal local workflow.
+- Do not load an entire plugin, skill, or agent-skills library when only one task-specific capability is needed.
 
 ## Task Complexity
 
@@ -944,6 +971,8 @@ When enabled, the user should be able to ask naturally. Do not require phrases l
 将探测结果写入 `.agents/capabilities.md` 和 `.agents/agent-skills.md`。
 
 如果环境支持工具发现，请优先使用工具发现能力列出可用工具。若不支持，则根据当前可见上下文和项目文件进行保守判断。
+
+后续任务执行时不必每次做全量探测；应按任务需要查询相关插件、skill、MCP tool、Superpowers、agent-skills 或本地工具，并复用 `.agents/capabilities.md` 和 `.agents/agent-skills.md` 中已有摘要。
 
 ## Superpowers 自动调用规则
 
@@ -1064,6 +1093,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 分配 Task ID，例如 `T-001`。
    - 写入 task log。
    - 判断是否有 Superpowers、agent-skills、skills、plugins 或 MCP tools 适合该任务。
+   - 如果任务需要专业能力，按需查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具。
    - 根据 `.agents/complexity.md` 判断任务复杂度。
    - 为任务定义目标、成功标准和验证方式。
    - 如果 agent-skills 可用，判断当前处于 `/spec`、`/plan`、`/build`、`/test`、`/review` 或 `/ship` 哪个阶段。
