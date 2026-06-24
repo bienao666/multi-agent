@@ -28,6 +28,7 @@ AI 编程助手会自动：
 - 建立任务协议、任务日志、验收清单和失败恢复流程。
 - 探测当前环境可用的 Superpowers、skills、plugins、MCP tools 和项目本地工具。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`。
+- 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
 ## 初始化后怎么使用
@@ -60,6 +61,9 @@ multi_agent: on
 ```
 
 启用后，在同一个项目里不需要再重复说“按多 Agent 流程”或“按 Manager / Builder / Reviewer 流程”。
+
+如果当前 AI 工具支持 `sub-agent`、`spawn_agent`、`worker`、`explorer` 等原生子智能体工具，Manager 会优先创建真实子智能体；这类客户端可能会在界面中展示子智能体列表和各自的改动统计。  
+如果只支持 thread 或独立会话，Manager 会创建或复用 Builder / Reviewer 独立会话；如果都不支持，则在当前会话中模拟角色切换。
 
 你可以直接像平常一样提需求：
 

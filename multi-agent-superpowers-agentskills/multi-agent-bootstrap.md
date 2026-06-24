@@ -13,7 +13,7 @@
 3. 创建 Manager、Builder、Reviewer 三个基础 Agent 的角色说明。
 4. 创建统一的消息协议、任务日志、验收流程和运行规则。
 5. 创建可开关的多 Agent 协作机制。默认关闭，用户本地启用后，复杂任务按“Manager 分配 -> Builder 执行 -> Reviewer 验收 -> Manager 汇总”的流程运行。
-6. 在可以使用 thread/thread message/subagent/multi-agent 相关工具时，优先创建或调用独立会话/子 Agent；如果当前环境没有这些工具，则用文档化的任务队列和角色切换模拟该流程。
+6. 在可以使用 sub-agent、spawn_agent、thread/thread message、worker、explorer 或 multi-agent 相关工具时，优先创建或调用真实子智能体/独立会话；如果当前环境没有这些工具，则用文档化的任务队列和角色切换模拟该流程。
 7. 自动探测当前环境可用的 Superpowers、agent-skills、skills、plugins、MCP tools 和内置工具，并把相关能力纳入 Agent 调度。
 8. 将多 Agent 协作设置为可选工作模式。初始化完成后默认关闭；只有检测到本地启用开关或用户显式要求时，才自动根据任务复杂度选择多 Agent 流程。
 9. 如果当前环境存在 `addyosmani/agent-skills` 或兼容的 Agent Skills 能力，必须优先把它作为工程流程技能库使用；如果不存在，则降级为 Superpowers + 本地多 Agent 流程。
@@ -84,6 +84,7 @@
   builder.md
   reviewer.md
   protocol.md
+  session-registry.md
   task-log.md
   handoff.md
   review-checklist.md
@@ -184,6 +185,7 @@ AGENTS.md
 任务编号:
 发送方:
 接收方:
+目标会话:
 目标:
 上下文:
 约束:
@@ -197,6 +199,7 @@ AGENTS.md
 任务编号:
 发送方:
 接收方:
+来源会话:
 状态:
 变更:
 测试:
@@ -210,6 +213,7 @@ AGENTS.md
 任务编号:
 发送方:
 接收方:
+目标会话:
 范围:
 修改文件:
 关注点:
@@ -222,9 +226,38 @@ AGENTS.md
 任务编号:
 发送方:
 接收方:
+来源会话:
 结论:
 发现:
 必须修改:
+```
+
+### `.agents/session-registry.md`
+
+创建独立会话注册表。
+
+必须包含：
+
+```md
+# Session Registry
+
+| 角色 | 会话标识 | 用途 | 状态 | 当前任务 | 最后更新 |
+| --- | --- | --- | --- | --- | --- |
+| Manager | current | 协调、任务拆解、最终汇总 | Active |  |  |
+| Builder |  | 实现、修改、运行验证 | Idle |  |  |
+| Reviewer |  | 审查、风险检查、测试缺口检查 | Idle |  |  |
+
+## Session Policy
+
+- Multi-Agent Mode 未启用时，不创建独立会话。
+- Multi-Agent Mode 启用且客户端支持 sub-agent、spawn_agent、worker、explorer、delegate、thread、child session 或类似能力时，Manager 必须优先创建或复用真实子智能体/独立会话。
+- 如果同时存在原生 sub-agent 工具和普通 thread 工具，优先使用原生 sub-agent 工具。
+- 默认只维护 Manager、Builder、Reviewer 三类常驻角色会话。
+- QA、Docs、Security、Architect 等临时会话只有在任务明确需要时才创建。
+- 一个任务最多创建 3 个临时会话，除非用户明确要求。
+- 每个独立会话只接收完成任务所需的最小上下文。
+- 独立会话完成任务后，必须向 Manager 返回结构化报告。
+- 如果环境不支持独立会话，则在当前会话中用 `## Acting As: <Role>` 模拟角色切换。
 ```
 
 ### `.agents/task-log.md`
@@ -781,6 +814,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 更新 `AGENTS.md`。
    - 初始化 `task-log.md`。
    - 初始化 `capabilities.md`。
+   - 初始化 `session-registry.md`。
    - 初始化 `settings.md`，默认写入 `multi_agent_default: off`。
    - 初始化 `agent-skills.md`。
    - 初始化 `complexity.md`、`decisions.md`、`lessons.md` 和 `failure-recovery.md`。
@@ -802,6 +836,8 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 如果匹配到合适能力，任务分配中必须包含 Capability、Reason 和 Fallback。
    - 如果匹配到 agent-skills，任务分配中必须包含 Agent Skills、Skill Reason 和 Skill Fallback。
    - 高风险任务必须在必要时请求用户确认。
+   - 如果 Multi-Agent Mode 已启用且环境支持独立会话，必须创建或复用 Builder / Reviewer 会话。
+   - 如果环境不支持独立会话，才在当前会话中模拟角色。
 
 5. **Execution**
    - Builder 执行时必须遵守项目原有模式。
@@ -821,13 +857,37 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 ## 调度规则
 
-如果当前 Agent 环境支持创建新 thread、发送消息到其他 thread、创建 subagent 或类似工具：
+如果 Multi-Agent Mode 已启用，且当前客户端开放了 sub-agent、spawn_agent、worker、explorer、delegate 或类似子智能体工具：
 
-- Manager 应优先使用真实独立 Agent。
-- Builder 和 Reviewer 应尽量运行在独立上下文中。
+- Manager 必须优先使用客户端原生 sub-agent 工具创建真实子智能体。
+- Builder 类型任务优先创建 `worker` 子智能体。
+- Reviewer / Explorer 类型任务优先创建 `explorer`、`reviewer` 或最接近的只读审查子智能体。
+- 每个子智能体必须接收明确、狭窄、可完成的任务。
+- 每个子智能体必须只接收完成任务所需的最小上下文。
+- 涉及代码修改时，必须明确子智能体拥有的文件或模块范围，避免多个子智能体写同一批文件。
+- Manager 不要重复执行已经派发给子智能体的同一任务。
+- Manager 在子智能体运行时，应继续处理不重叠的工作。
+- 子智能体完成后，Manager 负责审阅结果、整合变更和最终汇总。
+- Manager 必须把子智能体名称、角色、任务和状态记录到 `.agents/session-registry.md`。
+- 如果 agent-skills 可用，Manager 应把匹配到的 skill 或 slash command 写入子智能体任务说明。
+
+如果 Multi-Agent Mode 已启用，且当前 Agent 环境支持创建新 thread、发送消息到其他 thread、创建 subagent、worker、child session 或类似工具：
+
+- Manager 必须优先使用真实独立 Agent 或独立会话。
+- Manager 负责创建或复用 Builder 会话和 Reviewer 会话。
+- Builder 和 Reviewer 应运行在独立上下文中。
 - Manager 负责把必要上下文转发给它们，而不是让它们读取无关内容。
+- Manager 必须维护 `.agents/session-registry.md`。
+- 任务分配中必须写明 `目标会话`。
+- 子会话完成后必须把结构化报告返回 Manager。
+- Manager 负责最终汇总，不让 Builder 或 Reviewer 直接对用户做最终交付。
 
-如果当前环境不支持这些工具：
+如果 Multi-Agent Mode 未启用：
+
+- 不创建独立会话。
+- 按普通单 Agent 方式工作。
+
+如果 Multi-Agent Mode 已启用，但当前环境不支持这些工具：
 
 - Manager 在同一会话中模拟角色切换。
 - 每次切换角色时必须明确标注：
@@ -840,6 +900,31 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 ```md
 ## Acting As: Reviewer Agent
+```
+
+## 独立会话创建策略
+
+启用 Multi-Agent Mode 后，Manager 按以下策略创建或复用会话：
+
+1. 检查 `.agents/session-registry.md`。
+2. 如果 Builder 会话不存在且任务需要实现，创建 Builder 会话。
+3. 如果 Reviewer 会话不存在且任务需要验收，创建 Reviewer 会话。
+4. 如果已有对应会话且状态不是 Blocked，优先复用。
+5. 临时会话只在任务需要专业角色时创建，例如 QA、Docs、Security、Architect。
+6. 每次创建、复用、完成或阻塞会话，都更新 session registry。
+
+独立会话的初始消息必须包含：
+
+```md
+# Role Session Bootstrap
+
+角色:
+任务编号:
+职责:
+必要上下文:
+约束:
+验收标准:
+回复给:
 ```
 
 ## 默认 Agent 选择策略

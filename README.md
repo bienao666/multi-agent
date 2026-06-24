@@ -13,6 +13,7 @@
 | `multi-agent-superpowers` | 多 Agent 协作模板，支持自动探测 Superpowers、skills、plugins、MCP tools 和项目本地工具。 | 想要基础 Manager / Builder / Reviewer 流程，并让助手按可用增强能力执行任务。 | 默认关闭，本地可启用 |
 | `multi-agent-superpowers-agentskills` | 多 Agent 协作模板，额外集成 `addyosmani/agent-skills` 或兼容技能库，支持 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship` 等生命周期路由。 | 想把多 Agent 协作和工程生命周期技能结合起来，适合更规范的需求、计划、实现、测试、审查流程。 | 默认关闭，本地可启用 |
 | `work-context-system` | AI 工作上下文系统模板，提供人物库、项目库、事件库、产出模板库的 Markdown 结构和提示词。 | 想让 AI 更懂“写给谁看”、项目背景、历史事件和固定产出格式，适合汇报、复盘、方案、会议纪要等职场场景。 | 手动初始化 |
+| `vibe-coding-preflight` | Vibe Coding 开发前准备模板，先整理项目文件夹、定义 MVP、拆里程碑、建立 docs 和检查 Git，再进入编码。 | 新建 AI 产品、网页、工具或小项目时，想避免一上来就写代码导致项目混乱。 | 手动执行 |
 
 ## 通用使用流程
 
@@ -23,6 +24,8 @@
 5. 让助手把规则、模板或上下文结构写入目标项目。
 
 如果选择 `work-context-system`，则按该目录 README 初始化 `.work-context/`，它不依赖 `.agents/` 或多 Agent 开关。
+
+如果选择 `vibe-coding-preflight`，则按该目录 README 初始化 `docs/` 和项目 README，它适合作为新项目正式编码前的第一步。
 
 ## 开关机制
 
