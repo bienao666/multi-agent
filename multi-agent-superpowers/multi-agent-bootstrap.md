@@ -1,4 +1,4 @@
-# Multi-Agent Bootstrap Prompt
+﻿# Multi-Agent Bootstrap Prompt
 
 ---
 
@@ -348,14 +348,14 @@ AGENTS.md
 ```md
 # Multi-Agent Settings
 
-# 是否默认启用多 Agent 协作模式。
-# off：项目只安装规则，不自动启用，适合提交到团队仓库。
-# on：项目默认启用，多数团队不建议直接提交为 on。
+#### 是否默认启用多 Agent 协作模式。
+#### off：项目只安装规则，不自动启用，适合提交到团队仓库。
+#### on：项目默认启用，多数团队不建议直接提交为 on。
 multi_agent_default: off
 
-# 简单任务是否也需要 Reviewer 复核。
-# off：简单任务由 Manager 自检即可。
-# on：简单任务也进入 Manager + Reviewer 流程。
+#### 简单任务是否也需要 Reviewer 复核。
+#### off：简单任务由 Manager 自检即可。
+#### on：简单任务也进入 Manager + Reviewer 流程。
 reviewer_for_simple_default: off
 
 ## Meaning
@@ -369,22 +369,22 @@ reviewer_for_simple_default: off
 
 Individual developers may create `.agents/local-settings.md`:
 
-    # 是否在当前开发者本地启用多 Agent 协作模式。
-    # on：本地启用。
-    # off：本地关闭，并覆盖项目默认值。
+    #### 是否在当前开发者本地启用多 Agent 协作模式。
+    #### on：本地启用。
+    #### off：本地关闭，并覆盖项目默认值。
     multi_agent: on
 
-    # 简单任务是否也需要 Reviewer 复核。
-    # on：简单任务也由 Reviewer 检查。
-    # off：简单任务只由 Manager 自检。
+    #### 简单任务是否也需要 Reviewer 复核。
+    #### on：简单任务也由 Reviewer 检查。
+    #### off：简单任务只由 Manager 自检。
     reviewer_for_simple: on
 
 or:
 
-    # 本地关闭多 Agent 协作模式。
+    #### 本地关闭多 Agent 协作模式。
     multi_agent: off
 
-    # 本地关闭简单任务 Reviewer 复核。
+    #### 本地关闭简单任务 Reviewer 复核。
     reviewer_for_simple: off
 
 `local-settings.md` must be ignored by version control because it represents personal workflow preference.

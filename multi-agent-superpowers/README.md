@@ -1,4 +1,4 @@
-# Multi-Agent Bootstrap
+﻿# Multi-Agent Bootstrap
 
 这个目录提供一份可复制到任意项目 AI 编程助手或 Agent 会话中的多 Agent 启动文档：
 
@@ -96,10 +96,10 @@ multi_agent: on
 如果希望简单任务也由 Reviewer 复核，可以写成：
 
 ```text
-# 本地启用多 Agent 协作模式
+#### 本地启用多 Agent 协作模式
 multi_agent: on
 
-# 简单任务也启用 Reviewer 复核
+#### 简单任务也启用 Reviewer 复核
 reviewer_for_simple: on
 ```
 
@@ -159,10 +159,10 @@ AI 编程助手应自动：
 
 ```text
 .agents/settings.md
-# 项目默认不启用多 Agent，适合提交到团队仓库
+#### 项目默认不启用多 Agent，适合提交到团队仓库
 multi_agent_default: off
 
-# 简单任务默认不启用 Reviewer
+#### 简单任务默认不启用 Reviewer
 reviewer_for_simple_default: off
 ```
 
@@ -170,10 +170,10 @@ reviewer_for_simple_default: off
 
 ```text
 .agents/local-settings.md
-# 本地启用多 Agent
+#### 本地启用多 Agent
 multi_agent: on
 
-# 本地启用简单任务 Reviewer
+#### 本地启用简单任务 Reviewer
 reviewer_for_simple: on
 ```
 
@@ -181,10 +181,10 @@ reviewer_for_simple: on
 
 ```text
 .agents/local-settings.md
-# 本地关闭多 Agent
+#### 本地关闭多 Agent
 multi_agent: off
 
-# 本地关闭简单任务 Reviewer
+#### 本地关闭简单任务 Reviewer
 reviewer_for_simple: off
 ```
 

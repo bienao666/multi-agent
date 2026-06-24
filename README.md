@@ -1,4 +1,4 @@
-# AI Agent Playbook
+﻿# AI Agent Playbook
 
 这个仓库收集可复制到项目中的 AI 使用技巧、工作流模板和 Agent 协作方法。目标是把零散的 AI 使用经验沉淀成可复用的 Markdown Playbook，方便在不同项目、不同工具和不同工作场景中快速启用。
 
@@ -33,10 +33,10 @@
 
 ```text
 .agents/settings.md
-# 项目默认不启用多 Agent，适合提交到团队仓库
+#### 项目默认不启用多 Agent，适合提交到团队仓库
 multi_agent_default: off
 
-# 简单任务默认不启用 Reviewer
+#### 简单任务默认不启用 Reviewer
 reviewer_for_simple_default: off
 ```
 
@@ -44,10 +44,10 @@ reviewer_for_simple_default: off
 
 ```text
 .agents/local-settings.md
-# 本地启用多 Agent
+#### 本地启用多 Agent
 multi_agent: on
 
-# 本地启用简单任务 Reviewer 复核
+#### 本地启用简单任务 Reviewer 复核
 reviewer_for_simple: on
 ```
 
