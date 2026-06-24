@@ -26,9 +26,11 @@ AI 编程助手会自动：
 - 创建或更新 `.agents/` 协作目录。
 - 初始化 Manager、Builder、Reviewer 三个基础 Agent。
 - 建立任务协议、任务日志、验收清单和失败恢复流程。
+- 建立执行闭环、验证计划和迭代记录。
 - 探测当前环境可用的 Superpowers、skills、plugins、MCP tools 和项目本地工具。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
+- 创建 `.agents/execution-loop.md`、`.agents/validation-plan.md`、`.agents/iteration-log.md`，让任务按“执行 -> 验证 -> 修正 -> 沉淀”循环推进。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
 ## 从旧版本升级
@@ -137,6 +139,7 @@ AI 编程助手应自动：
 - 判断是否需要 Builder、Reviewer 或临时 Agent。
 - 判断是否有 Superpowers、skills、plugins 或 MCP tools 可以使用。
 - 按合适流程执行、验收并汇总。
+- 如果 Reviewer 未通过，Manager 会生成下一轮修正任务，而不是一次失败就结束。
 
 如果当前环境安装了 Superpowers 或其他 skills，可以这样说：
 

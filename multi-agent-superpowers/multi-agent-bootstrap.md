@@ -91,6 +91,9 @@
   capabilities.md
   settings.md
   complexity.md
+  execution-loop.md
+  validation-plan.md
+  iteration-log.md
   decisions.md
   lessons.md
   failure-recovery.md
@@ -482,6 +485,85 @@ Workflow:
 - Prefer fewer agents with clear handoffs over many agents with vague ownership.
 ```
 
+### `.agents/execution-loop.md`
+
+创建多 Agent 执行闭环规则。
+
+必须包含：
+
+```md
+# Execution Loop
+
+## Core Loop
+
+目标定义 -> Builder 执行 -> Reviewer 验证 -> Manager 判断 -> 修正或完成 -> 经验沉淀
+
+## Manager Responsibilities
+
+- 为每个任务定义目标、成功标准和验证方式。
+- 将可执行任务分配给 Builder。
+- 将验收任务分配给 Reviewer。
+- 根据 Reviewer 结果决定继续修正还是完成。
+- 将重要经验写入 `.agents/lessons.md`。
+
+## Builder Responsibilities
+
+- 实现最小必要变更。
+- 报告修改文件、测试结果、风险和问题。
+- 不扩大任务范围。
+
+## Reviewer Responsibilities
+
+- 对照成功标准验证结果。
+- 标出未满足的标准。
+- 给出下一轮必须修正的问题。
+- 判断是否需要更新 lessons 或 decisions。
+
+## Stop Conditions
+
+- 成功标准已满足。
+- 用户要求暂停。
+- 阻塞问题需要用户决策。
+- 环境或工具限制导致无法继续，并已记录原因。
+```
+
+### `.agents/validation-plan.md`
+
+创建验证计划模板。
+
+必须包含：
+
+```md
+# Validation Plan
+
+## 验证目标
+
+## 成功标准
+
+## 手动验证
+
+## 自动化测试
+
+## 关键路径
+
+## Reviewer 检查点
+
+## 失败后的下一步
+```
+
+### `.agents/iteration-log.md`
+
+创建迭代记录。
+
+必须包含：
+
+```md
+# Iteration Log
+
+| 任务编号 | 轮次 | 目标 | Builder 结果 | Reviewer 结论 | 下一步 | 更新时间 |
+| --- | --- | --- | --- | --- | --- | --- |
+```
+
 ### `.agents/decisions.md`
 
 创建项目决策日志。
@@ -734,6 +816,7 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - 初始化 `capabilities.md`。
    - 初始化 `session-registry.md`。
    - 初始化 `settings.md`，默认写入 `multi_agent_default: off`、`reviewer_for_simple_default: off`、`real_subagents_default: off`。
+   - 初始化 `execution-loop.md`、`validation-plan.md` 和 `iteration-log.md`。
    - 初始化 `complexity.md`、`decisions.md`、`lessons.md` 和 `failure-recovery.md`。
 
 3. **Task Intake**
@@ -744,6 +827,7 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - 写入 task log。
    - 判断是否有 Superpowers、skills、plugins 或 MCP tools 适合该任务。
    - 根据 `.agents/complexity.md` 判断任务复杂度。
+   - 为任务定义目标、成功标准和验证方式。
    - 启用后不要求用户显式说“按多 Agent 流程”。启用状态下的新请求默认进入 Manager intake。
 
 4. **Delegation**
@@ -762,9 +846,12 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
 
 6. **Review**
    - Reviewer 检查 Builder 的改动。
+   - Reviewer 必须对照成功标准和 `.agents/validation-plan.md` 验证。
+   - Reviewer 必须说明哪些成功标准已满足、哪些未满足。
    - 如果 `Needs Changes`，Manager 将修复任务重新分配给 Builder。
    - 如果 `Pass`，Manager 汇总交付。
    - 如果 Agent 之间意见冲突，Manager 按 `.agents/failure-recovery.md` 仲裁并记录决策。
+   - 每轮 Builder / Reviewer 结果必须更新 `.agents/iteration-log.md`。
 
 7. **Final Delivery**
    - 汇总完成内容。
@@ -890,6 +977,8 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
 任务只有在满足以下条件时才能标记为 `Done`：
 
 - Acceptance Criteria 已满足。
+- 成功标准已满足。
+- 验证方式已执行或未执行原因已说明。
 - 必要实现已完成。
 - Reviewer 已通过，或任务被判定为 Simple 且已自检。
 - 相关测试已运行，或未运行原因已说明。

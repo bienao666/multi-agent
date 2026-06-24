@@ -33,6 +33,9 @@ AI 助手会自动：
 - 明确产品目标。
 - 定义 MVP。
 - 拆分里程碑。
+- 定义成功标准。
+- 建立验证计划。
+- 建立执行循环。
 - 建立初始架构说明。
 - 定义后续 AI 协作角色，并与 `multi-agent-superpowers` 的 Manager / Builder / Reviewer 模式保持一致。
 - 检查 Git 状态。
@@ -45,6 +48,9 @@ docs/
   product.md
   mvp.md
   milestones.md
+  success-criteria.md
+  validation-plan.md
+  execution-loop.md
   architecture.md
   agent-roles.md
   decisions.md
@@ -58,4 +64,4 @@ README.md
 - 如果项目没有 Git 仓库，AI 应先询问是否执行 `git init`。
 - AI 不应自动提交代码。
 - AI 不应自动创建远程仓库。
-- 只有产品目标、MVP、M1 里程碑和 Git 状态明确后，才建议进入编码阶段。
+- 只有产品目标、MVP、M1 里程碑、成功标准、验证计划、执行循环和 Git 状态明确后，才建议进入编码阶段。

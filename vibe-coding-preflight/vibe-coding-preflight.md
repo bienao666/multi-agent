@@ -16,16 +16,19 @@
 2. 明确产品目标。
 3. 定义 MVP。
 4. 拆分里程碑。
-5. 建立基础项目文档。
-6. 检查或初始化 Git 仓库。
-7. 定义后续 AI 协作角色，直接参考 Manager / Builder / Reviewer 模式。
-8. 完成准备后，再询问用户是否进入编码阶段。
+5. 定义成功标准。
+6. 建立验证计划。
+7. 建立后续执行循环。
+8. 建立基础项目文档。
+9. 检查或初始化 Git 仓库。
+10. 定义后续 AI 协作角色，直接参考 Manager / Builder / Reviewer 模式。
+11. 完成准备后，再询问用户是否进入编码阶段。
 
 ## 工作原则
 
 - 先不要写业务代码。
 - 先不要引入框架或依赖，除非用户明确要求。
-- 先把产品目标、MVP、里程碑和项目结构说清楚。
+- 先把产品目标、MVP、里程碑、成功标准、验证方式和项目结构说清楚。
 - 如果信息不足，做最小合理假设，并把假设写入文档。
 - 任何代码实现都必须发生在 Preflight 完成之后。
 
@@ -38,6 +41,9 @@ docs/
   product.md
   mvp.md
   milestones.md
+  success-criteria.md
+  validation-plan.md
+  execution-loop.md
   architecture.md
   agent-roles.md
   decisions.md
@@ -105,6 +111,81 @@ README.md
 | M1 | 跑通主流程 |  |  | Planned |
 | M2 | 补关键功能 |  |  | Planned |
 | M3 | 优化体验 |  |  | Planned |
+```
+
+### `docs/success-criteria.md`
+
+定义什么叫“做成了”。
+
+必须包含：
+
+```md
+# Success Criteria
+
+## 产品成功标准
+
+## MVP 成功标准
+
+## M1 成功标准
+
+## 用户可感知结果
+
+## 不算成功的情况
+```
+
+### `docs/validation-plan.md`
+
+定义如何验证项目是否达标。
+
+必须包含：
+
+```md
+# Validation Plan
+
+## 验证目标
+
+## 手动验证
+
+## 自动化测试
+
+## 关键路径检查
+
+## 失败判定
+
+## 需要补充的数据或环境
+```
+
+### `docs/execution-loop.md`
+
+定义后续开发不是一次性写完，而是循环推进。
+
+必须包含：
+
+```md
+# Execution Loop
+
+## 默认循环
+
+计划 -> 执行 -> 验证 -> 修正 -> 记录经验
+
+## 每轮开始前
+
+- 明确本轮目标
+- 明确成功标准
+- 明确验证方式
+
+## 每轮结束后
+
+- 记录完成内容
+- 记录验证结果
+- 记录失败原因
+- 生成下一轮任务
+
+## 停止条件
+
+- 成功标准满足
+- 用户要求暂停
+- 阻塞问题需要人工决策
 ```
 
 ### `docs/architecture.md`
@@ -222,6 +303,9 @@ README 至少包含：
 - `docs/product.md`
 - `docs/mvp.md`
 - `docs/milestones.md`
+- `docs/success-criteria.md`
+- `docs/validation-plan.md`
+- `docs/execution-loop.md`
 - `docs/architecture.md`
 - `docs/agent-roles.md`
 - `docs/decisions.md`
@@ -268,21 +352,35 @@ git init
    - M1 必须优先跑通主流程。
    - 写入 `docs/milestones.md`。
 
-5. **Architecture Draft**
+5. **Success Criteria**
+   - 明确产品、MVP、M1 的成功标准。
+   - 明确不算成功的情况。
+   - 写入 `docs/success-criteria.md`。
+
+6. **Validation Plan**
+   - 明确如何验证成功标准。
+   - 包括手动验证、自动化测试、关键路径检查。
+   - 写入 `docs/validation-plan.md`。
+
+7. **Execution Loop**
+   - 定义后续开发循环：计划 -> 执行 -> 验证 -> 修正 -> 记录经验。
+   - 写入 `docs/execution-loop.md`。
+
+8. **Architecture Draft**
    - 只做初步结构，不急着写代码。
    - 如果技术栈未知，写候选方案。
    - 写入 `docs/architecture.md`。
 
-6. **Agent Role Setup**
+9. **Agent Role Setup**
    - 定义 Manager、Builder、Reviewer。
    - 明确 Preflight 阶段由 Manager 主导，编码阶段再进入 Builder / Reviewer。
    - 写入 `docs/agent-roles.md`。
 
-7. **Git Check**
+10. **Git Check**
    - 检查 Git 状态。
    - 必要时询问是否初始化。
 
-8. **Preflight Summary**
+11. **Preflight Summary**
    - 汇总已创建或更新的文件。
    - 列出当前 MVP。
    - 列出第一个里程碑。
@@ -300,6 +398,8 @@ Preflight 完成后输出：
 已创建或更新:
 MVP:
 当前里程碑:
+成功标准:
+验证方式:
 Git 状态:
 待确认问题:
 是否建议进入编码:
@@ -312,6 +412,9 @@ Git 状态:
 - 产品目标已记录。
 - MVP 已定义。
 - M1 里程碑已明确。
+- 成功标准已定义。
+- 验证计划已定义。
+- 执行循环已定义。
 - 项目文档入口已建立。
 - Git 状态已检查。
 - 用户确认可以开始编码。
