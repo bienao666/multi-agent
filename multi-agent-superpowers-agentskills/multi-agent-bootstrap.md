@@ -502,16 +502,18 @@ or:
     real_subagents: off
 
 `local-settings.md` must be ignored by version control because it represents personal workflow preference.
+`.agents/archive/` must also be ignored by version control because it contains local runtime history and can grow over time.
 ```
 
 同时，必须自动确保项目根目录 `.gitignore` 包含：
 
 ```gitignore
 .agents/local-settings.md
+.agents/archive/
 ```
 
-如果 `.gitignore` 已存在，追加该规则但不要重复添加。  
-如果 `.gitignore` 不存在，创建它并写入该规则。
+如果 `.gitignore` 已存在，追加这些规则但不要重复添加。  
+如果 `.gitignore` 不存在，创建它并写入这些规则。
 
 ### `.agents/prompt-version.md`
 

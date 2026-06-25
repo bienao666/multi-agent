@@ -78,9 +78,10 @@ real_subagents: on
 
 ```gitignore
 .agents/local-settings.md
+.agents/archive/
 ```
 
-如果目标项目没有 `.gitignore`，助手应创建一个并写入该规则。这样可以把多 Agent 协作模板提交到仓库，但不会强制所有同事启用。
+如果目标项目没有 `.gitignore`，助手应创建一个并写入这些规则。这样可以把多 Agent 协作模板提交到仓库，但不会强制所有同事启用，也不会把本地运行归档提交进去。
 
 ## 版本记录文件
 

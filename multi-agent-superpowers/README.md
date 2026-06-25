@@ -101,7 +101,7 @@ AI 编程助手会自动：
 升级时重点检查：
 
 - `.agents/settings.md` 是否包含带注释的 `multi_agent_default`、`reviewer_for_simple_default` 和 `real_subagents_default`。
-- `.agents/local-settings.md` 是否已加入 `.gitignore`。
+- `.agents/local-settings.md` 和 `.agents/archive/` 是否已加入 `.gitignore`。
 - `.agents/session-registry.md` 是否存在。
 - 协议字段是否包含 `目标会话` 和 `来源会话`。
 - 是否支持客户端原生 `sub-agent`、`spawn_agent`、`worker`、`explorer`。
@@ -129,7 +129,7 @@ AI 编程助手会自动：
 
 ```text
 请在当前项目为我本地启用 Multi-Agent Mode。
-创建 .agents/local-settings.md，写入 multi_agent: on，并自动把 .agents/local-settings.md 添加到项目根目录 .gitignore。
+创建 .agents/local-settings.md，写入 multi_agent: on，并自动把 .agents/local-settings.md 和 .agents/archive/ 添加到项目根目录 .gitignore。
 ```
 
 或者你也可以手动创建：
@@ -161,6 +161,7 @@ real_subagents: on
 
 ```gitignore
 .agents/local-settings.md
+.agents/archive/
 ```
 
 启用后，在同一个项目里不需要再重复说“按多 Agent 流程”或“按 Manager / Builder / Reviewer 流程”。
