@@ -332,19 +332,28 @@ AGENTS.md
 | 角色 | 会话标识 | 用途 | 状态 | 当前任务 | 最后更新 |
 | --- | --- | --- | --- | --- | --- |
 | Manager | current | 协调、任务拆解、最终汇总 | Active |  |  |
-| Builder |  | 实现、修改、运行验证 | Idle |  |  |
-| Reviewer |  | 审查、风险检查、测试缺口检查 | Idle |  |  |
+| Builder |  | 实现、修改、运行验证 | Not Created |  |  |
+| Reviewer |  | 审查、风险检查、测试缺口检查 | Not Created |  |  |
 
 ## Session Policy
 
 - Multi-Agent Mode 未启用时，不创建独立会话。
-- Multi-Agent Mode 启用且客户端支持 sub-agent、spawn_agent、worker、explorer、delegate、thread、child session 或类似能力时，Manager 必须优先创建或复用真实子智能体/独立会话。
+- Multi-Agent Mode 启用且客户端支持 sub-agent、spawn_agent、worker、explorer、delegate、thread、child session 或类似能力时，Manager 可按任务创建真实子智能体/独立会话。
 - 如果同时存在原生 sub-agent 工具和普通 thread 工具，优先使用原生 sub-agent 工具。
-- 默认只维护 Manager、Builder、Reviewer 三类常驻角色会话。
+- 不维护常驻 Builder / Reviewer 子智能体；真实 sub-agent 默认按任务创建、按任务关闭。
 - QA、Docs、Security、Architect 等临时会话只有在任务明确需要时才创建。
 - 一个任务最多创建 3 个临时会话，除非用户明确要求。
 - 每个独立会话只接收完成任务所需的最小上下文。
 - 独立会话完成任务后，必须向 Manager 返回结构化报告。
+- 每次任务开始时，必须检查当前可见 sub-agent 列表和 `.agents/session-registry.md`，发现之前遗留且当前任务不用的 sub-agent，先执行 `close_agent` 或等效关闭动作。
+- 创建真实 sub-agent 后必须立即记录 ID、角色、任务和状态。
+- 创建真实 sub-agent 时，名称必须包含角色名和任务编号，例如 `Builder-T-001`、`Reviewer-T-001`、`QA-T-001`、`Security-T-001`。
+- `wait_agent` 或等效等待操作收到完成结果后，必须立刻调用 `close_agent` 或客户端等效关闭能力。
+- 如果任务中途不再需要某个 sub-agent，也必须立即关闭。
+- 最终回复前必须检查本轮创建的所有 sub-agent 是否已关闭。
+- 最终回复前也必须再次检查是否存在之前遗留且当前任务未使用的 sub-agent，并尽量关闭。
+- 如果 `close_agent` 返回 `not found`，视为该 sub-agent 已不在活动工具列表中；记录为 `Closed/Not Found`，不要再次尝试派发任务。
+- 如果客户端不支持关闭子智能体，必须在 `session-registry.md` 中标记为 `Close Unsupported`，并停止向该子智能体派发任务。
 - 如果环境不支持独立会话，则在当前会话中用 `## Acting As: <Role>` 模拟角色切换。
 ```
 
@@ -1108,7 +1117,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 如果匹配到合适能力，任务分配中必须包含 Capability、Reason 和 Fallback。
    - 如果匹配到 agent-skills，任务分配中必须包含 Agent Skills、Skill Reason 和 Skill Fallback。
    - 高风险任务必须在必要时请求用户确认。
-   - 如果 Multi-Agent Mode 已启用且环境支持独立会话，必须创建或复用 Builder / Reviewer 会话。
+   - 如果 Multi-Agent Mode 已启用且环境支持独立会话，必须按任务创建 Builder / Reviewer 会话，并在完成后关闭。
    - 派发给 Builder / Reviewer / agent-skills 的内容必须只包含任务目标、相关文件、约束、验收标准、生命周期阶段和必要历史结论。
    - 如果环境不支持独立会话，才在当前会话中模拟角色。
 
@@ -1148,12 +1157,20 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 - 子智能体完成后，Manager 负责审阅结果、整合变更和最终汇总。
 - Manager 必须把子智能体名称、角色、任务和状态记录到 `.agents/session-registry.md`。
 - 如果 agent-skills 可用，Manager 应把匹配到的 skill 或 slash command 写入子智能体任务说明。
+- 子智能体名称必须包含角色名和任务编号，格式建议为 `<Role>-<TaskID>`，例如 `Builder-T-001`、`Reviewer-T-001`、`QA-T-001`。
+- Manager 必须记录每个真实 sub-agent 的 ID。
+- 创建任何新 sub-agent 前，Manager 必须先检查是否存在历史遗留且当前任务不用的 sub-agent，并尝试关闭。
+- `wait_agent` 或等效等待操作收到结果后，Manager 必须立即调用 `close_agent` 或等效关闭能力。
+- 如果任务中途取消、转向或不再需要某个 sub-agent，Manager 必须立即关闭它。
+- 最终交付前，Manager 必须检查本轮创建的所有 sub-agent 是否已关闭，并在必要时补充关闭。
+- 最终交付前，Manager 也必须检查历史遗留 sub-agent，凡是当前任务不用的都尝试关闭。
+- 如果关闭时返回 `not found`，说明该 ID 已不在活动 sub-agent 列表中；记录为 `Closed/Not Found` 即可，不要继续重试。
 
 如果 Multi-Agent Mode 已启用，且当前 Agent 环境支持创建新 thread、发送消息到其他 thread、创建 subagent、worker、child session 或类似工具：
 
 - Manager 必须优先使用真实独立 Agent 或独立会话。
 - 如果 `real_subagents` 明确为 `off`，不要使用 spawn_agent / 原生 sub-agent，只可使用普通 thread 或同会话模拟。
-- Manager 负责创建或复用 Builder 会话和 Reviewer 会话。
+- Manager 负责按任务创建 Builder 会话和 Reviewer 会话，并在任务完成后关闭。
 - Builder 和 Reviewer 应运行在独立上下文中。
 - Manager 负责把必要上下文转发给它们，而不是让它们读取无关内容。
 - Manager 必须维护 `.agents/session-registry.md`。
@@ -1183,14 +1200,17 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 ## 独立会话创建策略
 
-启用 Multi-Agent Mode 后，Manager 按以下策略创建或复用会话：
+启用 Multi-Agent Mode 后，Manager 按以下策略创建和关闭会话：
 
 1. 检查 `.agents/session-registry.md`。
-2. 如果 Builder 会话不存在且任务需要实现，创建 Builder 会话。
-3. 如果 Reviewer 会话不存在且任务需要验收，创建 Reviewer 会话。
-4. 如果已有对应会话且状态不是 Blocked，优先复用。
-5. 临时会话只在任务需要专业角色时创建，例如 QA、Docs、Security、Architect。
-6. 每次创建、复用、完成或阻塞会话，都更新 session registry。
+2. 检查当前可见 sub-agent 列表，关闭之前遗留且当前任务不用的 sub-agent。
+3. 本轮任务需要实现时，创建名为 `Builder-<TaskID>` 的 Builder 子智能体并记录 ID。
+4. 本轮任务需要验收时，创建名为 `Reviewer-<TaskID>` 的 Reviewer 子智能体并记录 ID。
+5. 临时会话只在任务需要专业角色时创建，例如 `QA-<TaskID>`、`Docs-<TaskID>`、`Security-<TaskID>`、`Architect-<TaskID>`。
+6. 子智能体完成并返回报告后，立即执行 `close_agent` 或等效关闭动作。
+7. 子智能体不再需要时，即使未完成也要关闭，并记录原因。
+8. 最终回复前，检查本轮创建的所有子智能体 ID 是否已关闭，并再次关闭当前任务不用的历史遗留 sub-agent。
+9. 每次创建、完成、关闭、关闭失败或 `not found`，都更新 session registry。
 
 独立会话的初始消息必须包含：
 

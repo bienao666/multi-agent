@@ -159,8 +159,10 @@ real_subagents: on
 
 启用后，在同一个项目里不需要再重复说“按多 Agent 流程”或“按 Manager / Builder / Reviewer 流程”。
 
-如果当前 AI 工具支持 `sub-agent`、`spawn_agent`、`worker`、`explorer` 等原生子智能体工具，Manager 会优先创建真实子智能体；这类客户端可能会在界面中展示子智能体列表和各自的改动统计。  
-如果只支持 thread 或独立会话，Manager 会创建或复用 Builder / Reviewer 独立会话；如果都不支持，则在当前会话中模拟角色切换。
+如果当前 AI 工具支持 `sub-agent`、`spawn_agent`、`worker`、`explorer` 等原生子智能体工具，Manager 会按任务创建真实子智能体；这类客户端可能会在界面中展示子智能体列表和各自的改动统计。  
+如果只支持 thread 或独立会话，Manager 会按任务创建 Builder / Reviewer 独立会话；如果都不支持，则在当前会话中模拟角色切换。
+
+注意：很多客户端不会在子智能体完成后自动从右侧列表移除。新版规则不复用子智能体；创建真实 sub-agent 后必须记录 ID，名称必须带角色和任务号，例如 `Builder-T-001`、`Reviewer-T-001`。`wait_agent` 收到结果后立即执行 `close_agent` 或等效关闭动作。每次任务开始和最终回复前，也会检查历史遗留且当前不用的 sub-agent，并尽量关闭。如果 `close_agent` 返回 `not found`，记录为 `Closed/Not Found` 即可。
 
 你可以直接像平常一样提需求：
 
