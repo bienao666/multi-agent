@@ -33,6 +33,7 @@ AI 编程助手会自动：
 - 创建 `.agents/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
 - 创建 `.agents/execution-loop.md`、`.agents/validation-plan.md`、`.agents/iteration-log.md`，让任务按“执行 -> 验证 -> 修正 -> 沉淀”循环推进。
+- 创建 `.agents/history-retention.md` 和 `.agents/archive/`，用于控制历史记录膨胀。
 - 后续只有在用户本地启用后，才按 Manager 分配、Builder 执行、Reviewer 验收、Manager 汇总的流程工作。
 
 ## Token 消耗优化
@@ -44,6 +45,18 @@ AI 编程助手会自动：
 - 简单任务默认由 Manager 精简处理和自检，不输出完整三段式报告。
 - Builder / Reviewer / sub-agent 只接收最小必要上下文。
 - 复杂任务、高风险任务、Reviewer 未通过或用户要求详细记录时，才进入完整上下文模式。
+
+## 历史记录保留
+
+历史记录采用“热记录 + 归档摘要”策略：
+
+- `task-log.md` 默认保留最近 50 条。
+- `iteration-log.md` 默认保留最近 50 条。
+- `session-registry.md` 默认保留当前任务、活动子智能体和最近 20 条关闭记录。
+- 旧记录移动到 `.agents/archive/`，按月份归档。
+- `.agents/archive/summary.md` 保存归档摘要。
+- 默认只读取热记录；排查历史问题、审计、复盘或用户要求时才读取归档。
+- 除非用户明确要求，不删除归档文件。
 
 ## 按需能力发现
 

@@ -73,6 +73,7 @@
 - 中等和复杂任务保留结构化字段，但每个字段优先写 1 到 3 行。
 - task log、iteration log、lifecycle loop 只追加一行摘要，不重复记录完整对话。
 - 能用文件路径、任务编号、阶段和结论表达的内容，不要复制大段代码或大段文档。
+- 历史记录按 `.agents/history-retention.md` 保留和归档；默认只读取热记录，不读取完整归档。
 
 ### 触发完整模式
 
@@ -180,9 +181,11 @@
   validation-plan.md
   iteration-log.md
   lifecycle-loop.md
+  history-retention.md
   decisions.md
   lessons.md
   failure-recovery.md
+  archive/
 AGENTS.md
 ```
 
@@ -791,6 +794,65 @@ Workflow:
 只有当成功标准满足、验证通过、Review 通过后，才进入 `/ship` 或最终交付。
 ```
 
+### `.agents/history-retention.md`
+
+创建历史记录保留策略。
+
+必须包含：
+
+```md
+# History Retention
+
+## Purpose
+
+避免 `.agents/` 历史记录无限增长，同时保留可追溯摘要。
+
+## Hot Records
+
+- `task-log.md`：默认只保留最近 50 条任务记录。
+- `iteration-log.md`：默认只保留最近 50 条迭代记录。
+- `lifecycle-loop.md`：规则长期保留；阶段变更记录只保留最近 50 条。
+- `session-registry.md`：默认只保留当前任务、活动子智能体、最近 20 条关闭记录。
+- `agent-skills.md`：规则长期保留；探测结果变化只保留最近摘要。
+- `lessons.md`：默认保留长期有效经验；重复或过期经验应合并。
+- `decisions.md`：长期保留关键决策，不做自动删除，只做摘要索引。
+- `prompt-version.md`：长期保留版本历史，不做自动删除。
+
+## Archive
+
+- 归档目录：`.agents/archive/`
+- 任务日志归档：`.agents/archive/task-log-YYYY-MM.md`
+- 迭代日志归档：`.agents/archive/iteration-log-YYYY-MM.md`
+- 生命周期记录归档：`.agents/archive/lifecycle-loop-YYYY-MM.md`
+- 会话日志归档：`.agents/archive/session-registry-YYYY-MM.md`
+- 归档摘要：`.agents/archive/summary.md`
+
+## Rotation Rules
+
+- 当热记录超过默认条数时，将旧记录移动到对应月份归档文件。
+- 移动前必须保留表头和最近记录，不要破坏 Markdown 表格。
+- 每次归档后更新 `.agents/archive/summary.md`，记录月份、数量、主题、生命周期阶段和关键风险。
+- 归档内容默认不在任务开始时读取；只有排查历史问题、审计、复盘或用户要求时才读取。
+
+## Compression Rules
+
+- 重复 lessons 合并为一条更通用、可执行的经验。
+- session-registry 中已关闭且无风险的记录，只保留 ID、角色、任务、关闭状态和时间。
+- task-log、iteration-log 和 lifecycle 阶段记录不保存完整对话，只保存摘要、结论、测试和风险。
+- 任何包含敏感信息的记录，归档前必须脱敏或只保留引用路径。
+
+## Manual Override
+
+用户可以要求：
+
+- 保留更多热记录。
+- 不自动归档。
+- 导出完整历史。
+- 清理旧归档。
+
+除非用户明确要求，不要删除归档文件。
+```
+
 ### `.agents/decisions.md`
 
 创建项目决策日志。
@@ -1093,6 +1155,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 初始化 `prompt-version.md`，首次版本为 `v0.1.0`。
    - 初始化 `agent-skills.md`。
    - 初始化 `execution-loop.md`、`validation-plan.md`、`iteration-log.md` 和 `lifecycle-loop.md`。
+   - 初始化 `history-retention.md` 和 `.agents/archive/`。
    - 初始化 `complexity.md`、`decisions.md`、`lessons.md` 和 `failure-recovery.md`。
 
 3. **Task Intake**
@@ -1134,6 +1197,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 如果 Agent 之间意见冲突，Manager 按 `.agents/failure-recovery.md` 仲裁并记录决策。
    - 每轮 Builder / Reviewer 结果必须更新 `.agents/iteration-log.md`。
    - 如果 agent-skills 可用，每轮生命周期阶段变化必须更新 `.agents/lifecycle-loop.md` 或引用其规则。
+   - 如果 task log、iteration log、lifecycle 记录或 session registry 超过保留上限，按 `.agents/history-retention.md` 归档旧记录。
 
 7. **Final Delivery**
    - 汇总完成内容。
