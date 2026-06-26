@@ -2,7 +2,7 @@
 
 这个仓库收集可复制到项目中的 AI 使用技巧、工作流模板和 Agent 协作方法。目标是把零散的 AI 使用经验沉淀成可复用的 Markdown Playbook，方便在不同项目、不同工具和不同工作场景中快速启用。
 
-当前内容包括多 Agent 协作、Superpowers / skills 自动调用、agent-skills 生命周期路由，以及 AI 工作上下文系统。后续也可以继续扩展更多 AI 编程、办公、知识管理、自动化和团队协作技巧。
+当前内容包括多 Agent 协作、Superpowers / skills 自动调用、agent-skills 生命周期路由、Ponytail 最小实现/反过度设计门禁，以及 AI 工作上下文系统。后续也可以继续扩展更多 AI 编程、办公、知识管理、自动化和团队协作技巧。
 
 每个目录都是一个独立能力包。进入对应目录后，阅读该目录的 `README.md`，再把其中的 Markdown 文档复制到目标项目或 AI 助手会话中执行。
 
@@ -14,9 +14,9 @@
 
 | 目录 | 功能 | 适合场景 | 默认状态 |
 | --- | --- | --- | --- |
-| `multi-agent-superpowers` | 多 Agent 协作模板，支持自动探测 Superpowers、skills、plugins、MCP tools 和项目本地工具，并加入执行闭环、验证计划和迭代记录。 | 想要基础 Manager / Builder / Reviewer 流程，并让助手围绕成功标准循环执行、验证、修正。 | 默认关闭，本地可启用 |
-| `multi-agent-superpowers-agentskills` | 多 Agent 协作模板，额外集成 `addyosmani/agent-skills` 或兼容技能库，支持 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship` 等生命周期闭环。 | 想把多 Agent 协作和工程生命周期技能结合起来，适合更规范的需求、计划、实现、测试、审查、发布流程。 | 默认关闭，本地可启用 |
-| `work-context-system` | AI 工作上下文系统模板，提供人物库、项目库、事件库、产出模板库的 Markdown 结构和提示词。 | 想让 AI 更懂“写给谁看”、项目背景、历史事件和固定产出格式，适合汇报、复盘、方案、会议纪要等职场场景。 | 手动初始化 |
+| `multi-agent-superpowers` | 多 Agent 协作模板，支持自动探测 Superpowers、skills、plugins、MCP tools、Ponytail 和项目本地工具，并加入执行闭环、验证计划和迭代记录。 | 想要基础 Manager / Builder / Reviewer 流程，并让助手围绕成功标准循环执行、验证、修正，同时避免过度设计。 | 默认关闭，本地可启用 |
+| `multi-agent-superpowers-agentskills` | 多 Agent 协作模板，额外集成 `addyosmani/agent-skills` 或兼容技能库，支持 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship` 等生命周期闭环，并把 Ponytail 映射到 `/build`、`/review`、`/code-simplify`。 | 想把多 Agent 协作和工程生命周期技能结合起来，适合更规范的需求、计划、实现、测试、审查、发布流程。 | 默认关闭，本地可启用 |
+| `work-context-system` | AI 工作上下文系统模板，提供人物库、项目库、事件库、产出模板库的 Markdown 结构和提示词，并加入最小充分上下文原则。 | 想让 AI 更懂“写给谁看”、项目背景、历史事件和固定产出格式，适合汇报、复盘、方案、会议纪要等职场场景，同时控制资料库膨胀。 | 手动初始化 |
 | `vibe-coding-preflight` | Vibe Coding 开发前准备模板，先整理项目文件夹、定义 MVP、成功标准、验证计划、执行循环、docs 和 Git，再进入编码。 | 新建 AI 产品、网页、工具或小项目时，想避免一上来就写代码导致项目混乱。 | 手动执行 |
 
 ## 通用使用流程
@@ -37,6 +37,16 @@
 - 调用前说明使用什么能力、为什么适合、不可用时怎么降级。
 - 能力不可用时继续使用本地流程，并在结果中说明限制。
 
+## Ponytail / 最小化能力
+
+如果当前环境存在 [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) 或类似最小实现、YAGNI、代码简化、输出压缩能力，各目录会按自己的目标使用：
+
+- `multi-agent-superpowers`：作为 Builder 写代码前和 Reviewer 审查时的最小实现门禁。
+- `multi-agent-superpowers-agentskills`：结合 agent-skills 生命周期，重点作用于 `/build`、`/review`、`/code-simplify`。
+- `work-context-system`：转换为“最小充分上下文”原则，减少重复记录、无用背景和产出膨胀。
+
+检测不到 Ponytail 时，不影响使用；对应目录会使用本地 Markdown 规则降级。
+
 如果选择 `work-context-system`，则按该目录 README 初始化 `.work-context/`，它不依赖 `.agents/` 或多 Agent 开关。
 
 如果选择 `vibe-coding-preflight`，则按该目录 README 初始化 `docs/` 和项目 README，它适合作为新项目正式编码前的第一步。
@@ -55,6 +65,9 @@ reviewer_for_simple_default: off
 
 #### 默认不预授权真实 sub-agent；需要本地开启后才可自动创建 Builder / Reviewer
 real_subagents_default: off
+
+#### 默认自动使用 Ponytail 或本地最小化门禁
+ponytail_default: auto
 ```
 
 个人本地启用：
@@ -69,6 +82,9 @@ reviewer_for_simple: on
 
 #### 本地授权真实 sub-agent 自动创建
 real_subagents: on
+
+#### 本地启用 Ponytail / 最小化门禁
+ponytail: auto
 ```
 
 其中 `reviewer_for_simple: on` 表示简单任务也会启用 Reviewer 复核；不需要时可以省略或设为 `off`。
@@ -89,5 +105,5 @@ real_subagents: on
 | --- | --- | --- | --- |
 | `multi-agent-superpowers` | `.agents/prompt-version.md` | `v0.1.0` | 修改多 Agent 规则、`.agents/` 协作规则或 `AGENTS.md` |
 | `multi-agent-superpowers-agentskills` | `.agents/prompt-version.md` | `v0.1.0` | 修改多 Agent 规则、agent-skills 路由、`.agents/` 协作规则或 `AGENTS.md` |
-| `work-context-system` | `.work-context/version.md` | `v0.1.0` | 修改上下文系统规则、目录结构、隐私规则或模板结构 |
+| `work-context-system` | `.work-context/version.md` | `v0.1.0` | 修改上下文系统规则、目录结构、隐私规则、最小充分上下文规则或模板结构 |
 | `vibe-coding-preflight` | `docs/prompt-version.md` | `v0.1.0` | 修改 Preflight 规则、`docs/` 准备结构或 README 入口 |

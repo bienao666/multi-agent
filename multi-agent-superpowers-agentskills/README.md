@@ -32,6 +32,7 @@ AI 编程助手会自动：
 - 探测当前环境可用的 Superpowers、agent-skills、skills、plugins、MCP tools 和项目本地工具。
 - 如果存在 agent-skills，自动按工程生命周期调用相关能力。
 - 在任务需要时自动查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具辅助。
+- 如果环境存在 Ponytail、agent-skills 代码简化能力或类似最小实现能力，会自动作为 `/build` 前和 `/review`、`/code-simplify` 阶段的反过度设计门禁；不存在时使用本地最小实现规则降级。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
 - 创建 `.agents/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
@@ -75,6 +76,33 @@ AI 编程助手会自动：
 - 没有合适能力时继续使用本地多 Agent 流程。
 - 不为了调用能力而扩大任务范围。
 
+## Ponytail 最小实现
+
+这个版本支持集成 [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) 或类似“最小实现 / YAGNI / 代码简化”能力，并会优先和 agent-skills 生命周期结合。
+
+默认配置为：
+
+```text
+#### 是否启用 Ponytail 最小实现门禁
+ponytail_default: auto
+```
+
+含义：
+
+- `auto`：实现、重构、依赖引入、架构改动和审查任务中自动使用；检测不到 Ponytail 时使用本地 Ponytail Ladder。
+- `off`：关闭该门禁。
+- `strict`：Builder 写代码前必须完成最小实现判断，并在报告中说明取舍。
+
+和 agent-skills 的关系：
+
+- `/spec`：挑战需求是否必须做。
+- `/plan`：删掉无必要任务和提前设计。
+- `/build`：先走最小实现判断，再写代码。
+- `/review`：检查过度设计和无必要依赖。
+- `/code-simplify`：优先删除、合并、复用，再考虑新增抽象。
+
+它不会替代 Manager / Builder / Reviewer，也不会替代 agent-skills；它只负责让实现更小、更贴近现有项目。
+
 ## 版本号规则
 
 初始化后会生成 `.agents/prompt-version.md`：
@@ -110,11 +138,13 @@ AI 编程助手会自动：
 - `.agents/local-settings.md` 和 `.agents/archive/` 是否已加入 `.gitignore`。
 - `.agents/session-registry.md` 是否存在。
 - `.agents/agent-skills.md` 是否存在并包含 lifecycle routing。
+- `.agents/ponytail.md` 是否存在，`settings.md` 是否包含 `ponytail_default`。
 - 协议字段是否包含 `目标会话` 和 `来源会话`。
 - 是否支持客户端原生 `sub-agent`、`spawn_agent`、`worker`、`explorer`。
 - 是否支持 `reviewer_for_simple`，让简单任务也可选进入 Reviewer。
 - Manager / Builder / Reviewer 输出字段是否已中文化。
 - agent-skills 路由是否包含 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/webperf`、`/code-simplify`、`/ship`。
+- Ponytail 是否已映射到 `/build`、`/review` 和 `/code-simplify`。
 - 是否包含 Token Budget Policy，避免每次任务全量读取 `.agents/` 或 agent-skills 技能库。
 - 是否包含 `.agents/prompt-version.md`，并能在后续规则变动时自动递增版本号。
 
@@ -247,6 +277,9 @@ reviewer_for_simple_default: off
 
 #### 默认不预授权真实 sub-agent；需要本地开启后才可自动创建 Builder / Reviewer
 real_subagents_default: off
+
+#### 默认自动使用 Ponytail 或本地最小实现门禁
+ponytail_default: auto
 ```
 
 个人本地开启：
@@ -261,6 +294,9 @@ reviewer_for_simple: on
 
 #### 本地授权真实 sub-agent 自动创建
 real_subagents: on
+
+#### 本地启用 Ponytail 最小实现门禁
+ponytail: auto
 ```
 
 个人本地关闭：
@@ -275,6 +311,9 @@ reviewer_for_simple: off
 
 #### 本地关闭真实 sub-agent 自动创建
 real_subagents: off
+
+#### 本地关闭 Ponytail 最小实现门禁
+ponytail: off
 ```
 
 当前消息也可以临时控制：

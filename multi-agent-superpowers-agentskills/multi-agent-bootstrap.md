@@ -173,6 +173,7 @@
   handoff.md
   review-checklist.md
   capabilities.md
+  ponytail.md
   settings.md
   prompt-version.md
   agent-skills.md
@@ -440,6 +441,88 @@ AGENTS.md
 - Docs Agent should use documentation, formatting, document generation, diagram, and citation capabilities.
 ```
 
+### `.agents/ponytail.md`
+
+创建 Ponytail 最小实现规则，并与 agent-skills 生命周期路由集成。
+
+必须包含：
+
+```md
+# Ponytail Minimal Implementation
+
+## Purpose
+
+Ponytail 是可选的最小实现门禁，用来防止过度设计、无必要依赖、无关重构和上下文膨胀。它不替代 Manager / Builder / Reviewer，也不替代 agent-skills；它负责在 `/build` 前压缩实现范围，并在 `/review`、`/code-simplify` 阶段检查复杂度。
+
+## Detection
+
+- 如果当前环境存在 Ponytail、ponytail skill、minimal implementation skill、YAGNI skill、code simplification skill 或类似能力，优先调用该能力。
+- 如果 agent-skills 可用，优先把 Ponytail 思路映射到 `/build`、`/review`、`/code-simplify` 和相关代码简化技能。
+- 如果不存在外部能力，使用本文件中的本地 Ponytail Ladder。
+- 如果 `.agents/local-settings.md` 包含 `ponytail: off`，本地关闭优先。
+- 如果 `.agents/local-settings.md` 包含 `ponytail: strict`，实现前必须完成 Ponytail Ladder。
+- 如果只有 `.agents/settings.md` 中的 `ponytail_default: auto`，在实现、重构、依赖引入、架构改动和审查任务中自动启用。
+
+## Ponytail Ladder
+
+Builder 在写代码前先回答：
+
+1. 这个改动是否真的需要存在？
+2. 项目里是否已经有现成能力、组件、工具函数、配置或脚本？
+3. 标准库、框架内置能力或平台原生能力能否解决？
+4. 已安装依赖能否解决，是否避免新增依赖？
+5. 是否可以用更小的改动完成，而不是新增抽象、层级或框架？
+6. 最小可验证改动是什么？
+7. 需要运行哪一个最小验证来证明它有效？
+
+## Agent Skills Mapping
+
+- `/spec`：挑战需求是否必须做，避免把未确认的愿望写成范围。
+- `/plan`：删掉无必要任务、无关重构和提前设计。
+- `/build`：先走 Ponytail Ladder，再做最小可验证实现。
+- `/test`：优先验证当前风险，不创建低价值测试堆积。
+- `/review`：检查过度设计、无必要依赖和可替代的现有能力。
+- `/code-simplify`：优先删除、合并、复用，再考虑新增抽象。
+- `/ship`：确认交付物只包含本次任务必要变更和说明。
+
+## Builder Rules
+
+- 优先复用现有代码和项目模式。
+- 不为未来可能需求提前设计。
+- 不新增依赖，除非现有能力无法满足且收益明确。
+- 不新增抽象，除非它能立即减少真实重复或降低当前复杂度。
+- 不做无关重构。
+- 如果选择了更复杂方案，必须说明为什么更小方案不够。
+
+## Reviewer Rules
+
+Reviewer 必须检查：
+
+- 是否引入了不必要的文件、依赖、抽象、配置或流程。
+- 是否能用已有代码或框架能力更简单地完成。
+- 是否存在为未来假设提前设计的内容。
+- 是否存在没有验证价值的测试、日志或文档膨胀。
+- 是否满足验收标准且保持改动最小。
+
+## Output Fields
+
+任务分配中如启用 Ponytail，加入：
+
+Ponytail:
+Ponytail Reason:
+Ponytail Fallback:
+
+Builder Report 中如启用 Ponytail，加入：
+
+Ponytail Check:
+最小实现取舍:
+
+Review Result 中如启用 Ponytail，加入：
+
+Ponytail Review:
+过度设计风险:
+```
+
 ### `.agents/settings.md`
 
 创建可提交的项目级默认设置。
@@ -464,12 +547,20 @@ reviewer_for_simple_default: off
 #### on：如果客户端开放 sub-agent 工具，Manager 可以自动创建真实 Builder / Reviewer 子智能体。
 real_subagents_default: off
 
+#### 是否启用 Ponytail 最小实现门禁。
+#### auto：如果环境存在 Ponytail 或 agent-skills 中的代码简化能力，则自动调用；不存在时使用本地最小实现门禁。
+#### off：不启用 Ponytail 门禁，只保留原有项目规则。
+#### strict：实现前必须完成 Ponytail Ladder，并在 Builder Report 中说明取舍。
+ponytail_default: auto
+
 ## Meaning
 
 - `off`: Multi-Agent Mode is available but not enabled by default.
 - `on`: Multi-Agent Mode is enabled by default for this project.
 - `reviewer_for_simple_default: off`: Simple tasks are handled by Manager with self-check only.
 - `reviewer_for_simple_default: on`: Simple tasks also require Reviewer.
+- `ponytail_default: auto`: Use Ponytail-style minimal implementation when useful, with agent-skills or local fallback.
+- `ponytail_default: strict`: Require the minimal implementation ladder before code changes.
 
 ## Local Override
 
@@ -490,6 +581,12 @@ Individual developers may create `.agents/local-settings.md`:
     #### off：不自动创建真实 sub-agent。
     real_subagents: on
 
+    #### 是否启用 Ponytail 最小实现门禁。
+    #### auto：检测到 Ponytail 或 agent-skills 代码简化能力时调用，否则使用本地最小实现门禁。
+    #### off：本地关闭。
+    #### strict：实现前必须完成 Ponytail Ladder。
+    ponytail: auto
+
 or:
 
     #### 本地关闭多 Agent 协作模式。
@@ -500,6 +597,9 @@ or:
 
     #### 本地关闭真实 sub-agent 自动创建。
     real_subagents: off
+
+    #### 本地关闭 Ponytail 最小实现门禁。
+    ponytail: off
 
 `local-settings.md` must be ignored by version control because it represents personal workflow preference.
 `.agents/archive/` must also be ignored by version control because it contains local runtime history and can grow over time.
@@ -1035,6 +1135,7 @@ When enabled, the user should be able to ask naturally. Do not require phrases l
 
 - 当前系统提示或工具列表中是否存在 Superpowers。
 - 当前系统提示或工具列表中是否存在 agent-skills、Agent Skills、addyosmani/agent-skills，或 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/webperf`、`/code-simplify`、`/ship` 等生命周期命令。
+- 当前系统提示或工具列表中是否存在 Ponytail、ponytail skill、minimal implementation、YAGNI、code simplification 或类似最小实现能力。
 - 当前系统提示或工具列表中是否存在 skills。
 - 当前系统提示或工具列表中是否存在 plugins。
 - 当前系统提示或工具列表中是否存在 MCP tools。
@@ -1042,6 +1143,7 @@ When enabled, the user should be able to ask naturally. Do not require phrases l
 - 当前项目是否已有脚本、测试命令、lint 命令、格式化命令、代码生成命令。
 
 将探测结果写入 `.agents/capabilities.md` 和 `.agents/agent-skills.md`。
+如果检测到 Ponytail 或类似能力，也写入 `.agents/ponytail.md` 的 Detection 小节或能力摘要。
 
 如果环境支持工具发现，请优先使用工具发现能力列出可用工具。若不支持，则根据当前可见上下文和项目文件进行保守判断。
 
@@ -1116,14 +1218,21 @@ Superpowers requested but not detected. Proceeding with local multi-agent workfl
    - QA 或 Reviewer 负责 `/test`、调试验证、浏览器验证。
    - Reviewer 负责 `/review`、安全、性能、简化建议。
 
-3. **优先级**
+3. **Ponytail 集成**
+   - `/spec` 阶段使用 Ponytail 思路挑战需求必要性和范围边界。
+   - `/plan` 阶段删除无必要任务、无关重构和提前设计。
+   - `/build` 阶段先执行 Ponytail Ladder，再做最小可验证实现。
+   - `/review` 阶段检查过度设计、无必要依赖和可复用现有能力。
+   - `/code-simplify` 阶段优先删除、合并、复用，再考虑新增抽象。
+
+4. **优先级**
    - 用户当前指令最高。
    - 项目本地规则高于外部技能偏好。
    - agent-skills 负责工程流程。
    - Superpowers 负责增强能力和工具自动化。
    - 本地脚本、测试、lint、构建命令负责最终证据。
 
-4. **调用前声明**
+5. **调用前声明**
 
 ```md
 Using agent-skills: <skill or command>
@@ -1131,11 +1240,49 @@ Using agent-skills: <skill or command>
 降级方案: <不可用时如何处理>
 ```
 
-5. **不可用时降级**
+6. **不可用时降级**
 
 ```md
 agent-skills not detected; using Superpowers/local multi-agent workflow.
 ```
+
+## Ponytail 最小实现规则
+
+如果当前环境存在 Ponytail、agent-skills 代码简化能力或类似最小实现能力，必须按以下规则使用：
+
+1. **启用判断**
+   - `ponytail: off` 或 `ponytail_default: off` 时不启用。
+   - `ponytail: auto` 或 `ponytail_default: auto` 时，在实现、重构、依赖引入、架构改动、审查和代码简化任务中启用。
+   - `ponytail: strict` 或 `ponytail_default: strict` 时，Builder 写代码前必须完成 Ponytail Ladder。
+
+2. **优先调用真实能力**
+   - 如果工具或 skill 中存在 Ponytail，先调用真实 Ponytail 能力。
+   - 如果 agent-skills 可用，优先映射到 `/build`、`/review`、`/code-simplify` 或相应代码简化技能。
+   - 如果不存在外部能力，使用 `.agents/ponytail.md` 的本地 Ponytail Ladder。
+
+3. **按角色使用**
+   - Manager 在任务分配中判断是否启用 Ponytail。
+   - Builder 在实现前完成最小实现判断。
+   - Reviewer 在审查时检查过度设计、无必要依赖和无关重构。
+
+4. **任务分配字段**
+
+```md
+Ponytail:
+Ponytail Reason:
+Ponytail Fallback:
+```
+
+5. **不可用时降级**
+
+```md
+Ponytail not detected; using local minimal implementation gate.
+```
+
+6. **边界**
+   - Ponytail 不得降低安全、隐私、测试、可访问性和验收标准。
+   - Ponytail 只减少不必要复杂度，不省略必要功能。
+   - 如果最小实现和长期可维护性冲突，Manager 记录取舍原因。
 
 ## 运行流程
 
@@ -1168,6 +1315,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 写入 task log。
    - 判断是否有 Superpowers、agent-skills、skills、plugins 或 MCP tools 适合该任务。
    - 如果任务需要专业能力，按需查询合适的插件、skill、MCP tool、Superpowers、agent-skills 或项目本地工具。
+   - 判断是否启用 Ponytail；实现、重构、依赖、架构、审查或代码简化任务默认按 `ponytail_default` 执行。
    - 根据 `.agents/complexity.md` 判断任务复杂度。
    - 为任务定义目标、成功标准和验证方式。
    - 如果 agent-skills 可用，判断当前处于 `/spec`、`/plan`、`/build`、`/test`、`/review` 或 `/ship` 哪个阶段。
@@ -1181,6 +1329,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
    - 高风险任务必须进入 Reviewer 验收。
    - 如果匹配到合适能力，任务分配中必须包含 Capability、Reason 和 Fallback。
    - 如果匹配到 agent-skills，任务分配中必须包含 Agent Skills、Skill Reason 和 Skill Fallback。
+   - 如果启用 Ponytail，任务分配中必须包含 Ponytail、Ponytail Reason 和 Ponytail Fallback。
    - 高风险任务必须在必要时请求用户确认。
    - 如果 Multi-Agent Mode 已启用且环境支持独立会话，必须按任务创建 Builder / Reviewer 会话，并在完成后关闭。
    - 派发给 Builder / Reviewer / agent-skills 的内容必须只包含任务目标、相关文件、约束、验收标准、生命周期阶段和必要历史结论。
@@ -1188,11 +1337,13 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 
 5. **Execution**
    - Builder 执行时必须遵守项目原有模式。
+   - Builder 在写代码前按 `.agents/ponytail.md` 完成最小实现判断；如果是真实 Ponytail 或 agent-skills 简化能力可用，优先调用。
    - Builder 完成后必须产出 Builder Report。
 
 6. **Review**
    - Reviewer 检查 Builder 的改动。
    - Reviewer 必须对照成功标准和 `.agents/validation-plan.md` 验证。
+   - Reviewer 必须检查是否存在过度设计、无必要依赖、无关重构或可用现有能力替代的实现。
    - Reviewer 必须说明哪些成功标准已满足、哪些未满足。
    - 如果 `Needs Changes`，Manager 将修复任务重新分配给 Builder。
    - 如果 `Pass`，Manager 汇总交付。
@@ -1340,6 +1491,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 - 成功标准已满足。
 - 验证方式已执行或未执行原因已说明。
 - 必要实现已完成。
+- 如果启用 Ponytail，最小实现取舍已说明，且无明显过度设计。
 - Reviewer 已通过，或任务被判定为 Simple 且已自检。
 - 相关测试已运行，或未运行原因已说明。
 - task log 已更新。
@@ -1355,6 +1507,7 @@ agent-skills not detected; using Superpowers/local multi-agent workflow.
 - 有 Acceptance Criteria。
 - 有 Capability 判断结果。
 - 有 agent-skills 判断结果。
+- 有 Ponytail 判断结果。
 - 有 Builder Report。
 - 有 Review Result。
 - task log 状态已更新。

@@ -29,6 +29,7 @@ AI 编程助手会自动：
 - 建立执行闭环、验证计划和迭代记录。
 - 探测当前环境可用的 Superpowers、skills、plugins、MCP tools 和项目本地工具。
 - 在任务需要时自动查询合适的插件、skill、MCP tool、Superpowers 或项目本地工具辅助。
+- 如果环境存在 Ponytail 或类似最小实现能力，会自动作为 Builder 实现前和 Reviewer 审查时的反过度设计门禁；不存在时使用本地最小实现规则降级。
 - 创建 `.agents/settings.md`，默认 `multi_agent_default: off`、`real_subagents_default: off`。
 - 创建 `.agents/prompt-version.md`，初始版本为 `v0.1.0`，后续规则变动自动递增版本号。
 - 创建 `.agents/session-registry.md`，用于在启用多 Agent 后记录 Builder / Reviewer 等独立会话。
@@ -69,6 +70,32 @@ AI 编程助手会自动：
 - 没有合适能力时继续使用本地多 Agent 流程。
 - 不为了调用能力而扩大任务范围。
 
+## Ponytail 最小实现
+
+这个版本支持集成 [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) 或类似“最小实现 / YAGNI / 代码简化”能力。
+
+默认配置为：
+
+```text
+#### 是否启用 Ponytail 最小实现门禁
+ponytail_default: auto
+```
+
+含义：
+
+- `auto`：实现、重构、依赖引入、架构改动和审查任务中自动使用；检测不到 Ponytail 时使用本地 Ponytail Ladder。
+- `off`：关闭该门禁。
+- `strict`：Builder 写代码前必须完成最小实现判断，并在报告中说明取舍。
+
+本地可在 `.agents/local-settings.md` 覆盖：
+
+```text
+#### 本地启用 Ponytail 最小实现门禁
+ponytail: auto
+```
+
+它不会替代 Manager / Builder / Reviewer，只负责提醒 Builder 先复用已有能力、避免无关重构和不必要依赖，并让 Reviewer 检查是否过度设计。
+
 ## 版本号规则
 
 初始化后会生成 `.agents/prompt-version.md`：
@@ -106,6 +133,7 @@ AI 编程助手会自动：
 - 协议字段是否包含 `目标会话` 和 `来源会话`。
 - 是否支持客户端原生 `sub-agent`、`spawn_agent`、`worker`、`explorer`。
 - 是否支持 `reviewer_for_simple`，让简单任务也可选进入 Reviewer。
+- 是否包含 `.agents/ponytail.md`、`ponytail_default` 和 Ponytail 最小实现门禁。
 - Manager / Builder / Reviewer 输出字段是否已中文化。
 - 是否包含 Token Budget Policy，避免每次任务全量读取 `.agents/`。
 - 是否包含 `.agents/prompt-version.md`，并能在后续规则变动时自动递增版本号。
@@ -225,6 +253,9 @@ reviewer_for_simple_default: off
 
 #### 默认不预授权真实 sub-agent；需要本地开启后才可自动创建 Builder / Reviewer
 real_subagents_default: off
+
+#### 默认自动使用 Ponytail 或本地最小实现门禁
+ponytail_default: auto
 ```
 
 个人本地开启：
@@ -239,6 +270,9 @@ reviewer_for_simple: on
 
 #### 本地授权真实 sub-agent 自动创建
 real_subagents: on
+
+#### 本地启用 Ponytail 最小实现门禁
+ponytail: auto
 ```
 
 个人本地关闭：
@@ -253,6 +287,9 @@ reviewer_for_simple: off
 
 #### 本地关闭真实 sub-agent 自动创建
 real_subagents: off
+
+#### 本地关闭 Ponytail 最小实现门禁
+ponytail: off
 ```
 
 当前消息也可以临时控制：
